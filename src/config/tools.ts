@@ -41,6 +41,12 @@ export const CATEGORIES: ToolCategoryInfo[] = [
     textColor: 'text-slate-600',
   },
   {
+    key: 'entertainment',
+    label: '影音娱乐',
+    color: 'bg-rose-100',
+    textColor: 'text-rose-600',
+  },
+  {
     key: 'other',
     label: '其他',
     color: 'bg-gray-100',
@@ -246,5 +252,18 @@ export const TOOLS: ToolItem[] = [
     icon: 'Clock',
     path: '/tools/timestamp',
     tags: ['时间戳', 'timestamp', '时间', 'unix'],
+  },
+
+  // ── 影音娱乐 ──────────────────────────────────
+  {
+    id: 'movie-tv',
+    name: '影视大全',
+    description: '热门电影、电视剧、动漫、综艺、纪录片，一站式浏览',
+    category: 'entertainment',
+    icon: 'Clapperboard',
+    path: '/tools/movie-tv',
+    tags: ['电影', '电视剧', '动漫', '综艺', '影视', '视频', '追剧'],
+    isNew: true,
+    isHot: true,
   },
 ]

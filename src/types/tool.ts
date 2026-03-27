@@ -5,6 +5,7 @@ export type ToolCategory =
   | 'encode'   // 编解码
   | 'life'     // 生活实用
   | 'dev'      // 开发工具
+  | 'entertainment' // 影音娱乐
   | 'other'    // 其他
 
 export interface ToolCategoryInfo {

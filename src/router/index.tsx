@@ -19,6 +19,7 @@ import { SkewersCountPage } from '@/pages/tools/SkewersCountPage'
 import { ColorPickerPage } from '@/pages/tools/ColorPickerPage'
 import { RegexTestPage } from '@/pages/tools/RegexTestPage'
 import { TimestampPage } from '@/pages/tools/TimestampPage'
+import { MovieTVPage } from '@/pages/tools/MovieTV'
 
 export function AppRouter() {
   return (
@@ -57,6 +58,9 @@ export function AppRouter() {
         <Route path="/tools/color-picker" element={<ColorPickerPage />} />
         <Route path="/tools/regex-test" element={<RegexTestPage />} />
         <Route path="/tools/timestamp" element={<TimestampPage />} />
+
+        {/* ── 影音娱乐 ────────────────────── */}
+        <Route path="/tools/movie-tv" element={<MovieTVPage />} />
 
         {/* 兜底重定向 */}
         <Route path="*" element={<Navigate to="/" replace />} />
