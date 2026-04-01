@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
-import type { ConvertProgress, MathpixConfig, RecognizedFormula, PdfPageInfo } from '../types'
+import type { ConvertProgress, PdfPageInfo } from '../types'
 import { pdfToImages } from '../utils/pdfToImages'
-import { recognizeFormulasFromPages } from '../utils/mathpixOcr'
+import { recognizeDocumentFromPages } from '../utils/simpleTexOcr'
 import { generateWordDocument } from '../utils/generateDocx'
 
 const initialProgress: ConvertProgress = {
@@ -9,28 +9,25 @@ const initialProgress: ConvertProgress = {
   totalPages: 0,
   currentPage: 0,
   message: '',
-  formulas: [],
+  pages: [],
 }
 
 export function usePdfConverter() {
   const [progress, setProgress] = useState<ConvertProgress>(initialProgress)
-  const [pages, setPages] = useState<PdfPageInfo[]>([])
+  const [pdfPages, setPdfPages] = useState<PdfPageInfo[]>([])
 
   /**
    * 重置状态
    */
   const reset = useCallback(() => {
     setProgress(initialProgress)
-    setPages([])
+    setPdfPages([])
   }, [])
 
   /**
    * 转换 PDF 到 Word
    */
-  const convert = useCallback(async (
-    file: File,
-    config: MathpixConfig
-  ) => {
+  const convert = useCallback(async (file: File) => {
     try {
       // 阶段1: 解析 PDF
       setProgress({
@@ -38,10 +35,10 @@ export function usePdfConverter() {
         totalPages: 0,
         currentPage: 0,
         message: '正在解析 PDF 文件...',
-        formulas: [],
+        pages: [],
       })
 
-      const pdfPages = await pdfToImages(file, 2, (current, total) => {
+      const pages = await pdfToImages(file, 2, (current, total) => {
         setProgress((prev) => ({
           ...prev,
           totalPages: total,
@@ -50,28 +47,27 @@ export function usePdfConverter() {
         }))
       })
 
-      setPages(pdfPages)
+      setPdfPages(pages)
 
-      // 阶段2: 识别公式
+      // 阶段2: 识别文档内容
       setProgress((prev) => ({
         ...prev,
         status: 'converting',
-        message: '正在识别数学公式...',
+        message: '正在识别文档内容...',
         currentPage: 0,
       }))
 
-      const formulas = await recognizeFormulasFromPages(
-        pdfPages.map((p) => ({
+      const recognizedPages = await recognizeDocumentFromPages(
+        pages.map((p) => ({
           pageNumber: p.pageNumber,
           imageDataUrl: p.imageDataUrl,
         })),
-        config,
-        (current, total) => {
+        (current: number, total: number) => {
           setProgress((prev) => ({
             ...prev,
             currentPage: current,
             totalPages: total,
-            message: `正在识别公式: ${current}/${total} 页`,
+            message: `正在识别文档: ${current}/${total} 页`,
           }))
         }
       )
@@ -83,17 +79,17 @@ export function usePdfConverter() {
         message: '正在生成 Word 文档...',
       }))
 
-      await generateWordDocument(formulas, file.name)
+      await generateWordDocument(recognizedPages, file.name)
 
       // 完成
       setProgress((prev) => ({
         ...prev,
         status: 'done',
-        formulas,
-        message: `完成！共识别 ${formulas.length} 个公式`,
+        pages: recognizedPages,
+        message: `完成!共识别 ${recognizedPages.length} 页`,
       }))
 
-      return { success: true, formulas }
+      return { success: true, pages: recognizedPages }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '转换失败'
       setProgress((prev) => ({
@@ -108,7 +104,7 @@ export function usePdfConverter() {
 
   return {
     progress,
-    pages,
+    pdfPages,
     convert,
     reset,
   }

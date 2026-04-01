@@ -6,13 +6,13 @@ export function latexToMathML(latex: string): string {
   let ml = latex
 
   // 基础替换
-  const replacements: [RegExp, string] = [
+  const replacements: unknown[] = [
     // 分数 \frac{a}{b} -> <mfrac>...
     [/\\frac\{([^}]+)\}\{([^}]+)\}/g, '<mfrac><mrow>$1</mrow><mrow>$2</mrow></mfrac>'],
 
     // 上标 x^2 -> <msup>x2</msup>
-    [/\^(\{[^}]+\}|.)/g, (_, p1) => {
-      const content = p1.startsWith('{') ? p1.slice(1, -1) : p1
+    [/\^(\{[^}]+\}|.)/g, (_: unknown, p1: unknown) => {
+      const content = (p1 as string).startsWith('{') ? (p1 as string).slice(1, -1) : p1
       return `<msup><mrow></mrow><mrow>${content}</mrow></msup>`
     }],
 
@@ -65,8 +65,9 @@ export function latexToMathML(latex: string): string {
     [/\\[a-zA-Z]+/g, ''],
   ]
 
-  for (const [pattern, replacement] of replacements) {
-    ml = ml.replace(pattern, replacement as string)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  for (const [pattern, replacement] of replacements as any[]) {
+    ml = ml.replace(pattern, replacement)
   }
 
   // 包装成 MathML

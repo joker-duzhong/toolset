@@ -1,8 +1,9 @@
 import * as pdfjsLib from 'pdfjs-dist'
+import type { RenderParameters } from 'pdfjs-dist/types/src/display/api'
 import type { PdfPageInfo } from '../types'
 
-// 设置 PDF.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
+// 设置 PDF.js worker (PDF.js 5.x 使用 .mjs 扩展名)
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`
 
 /**
  * 将 PDF 文件转换为图片数组
@@ -31,7 +32,8 @@ export async function pdfToImages(
     await page.render({
       canvasContext: context,
       viewport,
-    }).promise
+      canvas,
+    } as unknown as RenderParameters).promise
 
     // 转换为 Data URL
     const imageDataUrl = canvas.toDataURL('image/png')

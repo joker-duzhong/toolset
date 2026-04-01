@@ -1,20 +1,12 @@
-// Mathpix API 配置
-export interface MathpixConfig {
-  appId: string
-  appKey: string
+// SimpleTex API 配置
+export interface SimpleTexConfig {
+  token: string // 用户授权令牌 (UAT)
 }
 
-// 识别出的公式
-export interface RecognizedFormula {
-  id: string
-  latex: string
-  pageIndex: number
-  rect?: {
-    x: number
-    y: number
-    width: number
-    height: number
-  }
+// 识别出的文档页面
+export interface DocumentPage {
+  pageNumber: number
+  content: string // Markdown 格式内容
 }
 
 // 转换状态
@@ -26,7 +18,7 @@ export interface ConvertProgress {
   totalPages: number
   currentPage: number
   message: string
-  formulas: RecognizedFormula[]
+  pages: DocumentPage[] // 识别出的页面内容
   error?: string
 }
 
