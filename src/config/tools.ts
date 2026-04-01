@@ -266,4 +266,16 @@ export const TOOLS: ToolItem[] = [
     isNew: true,
     isHot: true,
   },
+
+  // ── 文档处理 ──────────────────────────────────
+  {
+    id: 'pdf-to-word',
+    name: 'PDF 公式提取',
+    description: '提取 PDF 中的数学公式，导出为可编辑的 Word 文档',
+    category: 'convert',
+    icon: 'FileText',
+    path: '/tools/pdf-to-word',
+    tags: ['PDF', 'Word', '公式', 'LaTeX', '数学', '转换'],
+    isNew: true,
+  },
 ]
