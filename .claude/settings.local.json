@@ -6,7 +6,11 @@
       "WebSearch",
       "Bash(npm run:*)",
       "Bash(rm -rf node_modules/.cache)",
-      "Bash(npx run:*)"
+      "Bash(npx run:*)",
+      "Bash(npx vite:*)",
+      "Bash(curl -s \"https://api.lxyy.fun/api/v1/auth/wechat/url?redirect_uri=https://example.com\")",
+      "Bash(npm uninstall:*)",
+      "Bash(ls e:/code/hope/toolset/dist/assets/*.css)"
     ]
   }
 }

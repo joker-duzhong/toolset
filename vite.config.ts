@@ -14,13 +14,25 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  server: {
-    proxy: {
-      '/api/simpletex': {
-        target: 'https://server.simpletex.cn',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/simpletex/, '/api'),
-      },
+  css: {
+    postcss: {
+      plugins: [
+        {
+          postcssPlugin: 'remove-cascade-layers',
+          OnceExit(root) {
+            const layers: import('postcss').AtRule[] = []
+            root.walkAtRules('layer', (rule) => { layers.push(rule) })
+            for (const rule of layers) {
+              if (rule.nodes) {
+                rule.replaceWith(rule.nodes)
+              } else {
+                rule.remove()
+              }
+            }
+          },
+        },
+      ],
     },
   },
+  server: {},
 })

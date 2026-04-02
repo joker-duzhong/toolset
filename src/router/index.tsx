@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
+import { AuthLoadingScreen } from '@/components/AuthLoadingScreen'
 import { HomePage } from '@/pages/HomePage'
 import { WatermarkRemoverPage } from '@/pages/tools/WatermarkRemoverPage'
 import { ImageCompressPage } from '@/pages/tools/ImageCompressPage'
@@ -20,9 +22,14 @@ import { ColorPickerPage } from '@/pages/tools/ColorPickerPage'
 import { RegexTestPage } from '@/pages/tools/RegexTestPage'
 import { TimestampPage } from '@/pages/tools/TimestampPage'
 import { MovieTVPage } from '@/pages/tools/MovieTV'
-import { PdfToWordPage } from '@/pages/tools/PdfToWord'
 
 export function AppRouter() {
+  const { status } = useAuth()
+
+  if (status === 'checking') {
+    return <AuthLoadingScreen />
+  }
+
   return (
     <BrowserRouter>
       <Routes>
@@ -63,8 +70,6 @@ export function AppRouter() {
         {/* ── 影音娱乐 ────────────────────── */}
         <Route path="/tools/movie-tv" element={<MovieTVPage />} />
 
-        {/* ── 文档处理 ────────────────────── */}
-        <Route path="/tools/pdf-to-word" element={<PdfToWordPage />} />
 
         {/* 兜底重定向 */}
         <Route path="*" element={<Navigate to="/" replace />} />
