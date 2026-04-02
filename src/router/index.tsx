@@ -22,6 +22,7 @@ import { ColorPickerPage } from '@/pages/tools/ColorPickerPage'
 import { RegexTestPage } from '@/pages/tools/RegexTestPage'
 import { TimestampPage } from '@/pages/tools/TimestampPage'
 import { MovieTVPage } from '@/pages/tools/MovieTV'
+import { TradeCopilotPage } from '@/pages/tools/TradeCopilot'
 
 export function AppRouter() {
   const { status } = useAuth()
@@ -69,6 +70,9 @@ export function AppRouter() {
 
         {/* ── 影音娱乐 ────────────────────── */}
         <Route path="/tools/movie-tv" element={<MovieTVPage />} />
+
+        {/* ── 金融理财 ────────────────────── */}
+        <Route path="/tools/trade-copilot" element={<TradeCopilotPage />} />
 
 
         {/* 兜底重定向 */}

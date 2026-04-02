@@ -47,6 +47,12 @@ export const CATEGORIES: ToolCategoryInfo[] = [
     textColor: 'text-rose-600',
   },
   {
+    key: 'finance',
+    label: '金融理财',
+    color: 'bg-cyan-100',
+    textColor: 'text-cyan-600',
+  },
+  {
     key: 'other',
     label: '其他',
     color: 'bg-gray-100',
@@ -265,6 +271,18 @@ export const TOOLS: ToolItem[] = [
     tags: ['电影', '电视剧', '动漫', '综艺', '影视', '视频', '追剧'],
     isNew: true,
     isHot: true,
+  },
+
+  // ── 金融理财 ──────────────────────────────────
+  {
+    id: 'trade-copilot',
+    name: 'Trade Copilot',
+    description: 'A股实盘交易辅助，纪律交易、持仓管理、策略引擎',
+    category: 'finance',
+    icon: 'TrendingUp',
+    path: '/tools/trade-copilot',
+    tags: ['A股', '交易', '持仓', '策略', '股票', '复盘'],
+    isNew: true,
   },
 
 ]
