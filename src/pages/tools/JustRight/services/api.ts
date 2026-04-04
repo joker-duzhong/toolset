@@ -92,28 +92,12 @@ export const memoApi = {
 }
 
 // ============ 图片上传 API ============
+// TODO: 后期接入 OSS 后实现
 export const uploadApi = {
-  image: async (file: File): Promise<string> => {
-    const { getStoredTokens } = await import('@/utils/storage')
-    const tokens = getStoredTokens()
-    const formData = new FormData()
-    formData.append('file', file)
-
-    const res = await fetch(`https://api.lxyy.fun/api/v1${BASE}/upload`, {
-      method: 'POST',
-      headers: {
-        ...(tokens ? { Authorization: `Bearer ${tokens.accessToken}` } : {}),
-        'X-App': APP_KEY,
-      },
-      body: formData,
-    })
-
-    if (!res.ok) {
-      throw new Error('Upload failed')
-    }
-
-    const result = await res.json()
-    return result.data.url
+  /** 暂未实现，后期接入 OSS */
+  image: async (_file: File): Promise<string> => {
+    // 预留接口，暂不实现
+    throw new Error('图片上传功能暂未开放')
   },
 }
 
