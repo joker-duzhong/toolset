@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react'
 import { Copy, Check } from 'lucide-react'
 import { PageHeader } from '@/components/PageHeader'
-import { cn } from '@/utils/cn'
 
 // ── 转换工具函数 ──────────────────────────────────
 function hexToRgb(hex: string): [number, number, number] | null {
@@ -36,10 +35,10 @@ function hslToRgb(h: number, s: number, l: number): [number, number, number] {
 }
 
 export function ColorPickerPage() {
-  const [hex, setHex] = useState('#6366f1')
+  const [hex, setHex] = useState('#0d99ff')
   const [copied, setCopied] = useState<string | null>(null)
 
-  const rgb = hexToRgb(hex) ?? [99, 102, 241]
+  const rgb = hexToRgb(hex) ?? [13, 153, 255]
   const hsl = rgbToHsl(...rgb)
 
   const copy = useCallback((label: string, text: string) => {
@@ -75,51 +74,167 @@ export function ColorPickerPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
       <PageHeader title="颜色工具" subtitle="HEX / RGB / HSL 互转" />
       <main className="flex-1 px-4 py-5 flex flex-col gap-4">
         {/* 色块预览 */}
-        <div className="h-28 rounded-2xl shadow-sm border border-white/20 transition-all" style={{ background: hex }} />
+        <div
+          className="h-28 transition-all"
+          style={{
+            background: hex,
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid rgba(255,255,255,0.2)',
+          }}
+        />
 
         {/* 原生颜色选择器 */}
-        <div className="flex items-center gap-3 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
-          <label className="text-xs font-medium text-gray-500 flex-shrink-0">取色盘</label>
-          <input type="color" value={hex} onChange={e => setHex(e.target.value)}
-            className="w-full h-10 cursor-pointer rounded-xl border-0 bg-transparent" />
+        <div
+          className="flex items-center gap-3 p-4"
+          style={{
+            backgroundColor: 'var(--color-bg-base)',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid var(--color-border-light)',
+          }}
+        >
+          <label
+            className="text-xs font-medium shrink-0"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
+            取色盘
+          </label>
+          <input
+            type="color"
+            value={hex}
+            onChange={e => setHex(e.target.value)}
+            className="w-full h-10 cursor-pointer border-0 bg-transparent"
+            style={{ borderRadius: 'var(--radius-md)' }}
+          />
         </div>
 
         {/* HEX 输入 */}
-        <div className="flex flex-col gap-1 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
-          <label className="text-xs font-medium text-gray-500">HEX</label>
-          <input value={hex} onChange={e => handleHexInput(e.target.value)}
-            className="h-10 px-3 rounded-xl bg-gray-100 text-sm font-mono outline-none focus:ring-2 focus:ring-indigo-400" />
+        <div
+          className="flex flex-col gap-1 p-4"
+          style={{
+            backgroundColor: 'var(--color-bg-base)',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid var(--color-border-light)',
+          }}
+        >
+          <label
+            className="text-xs font-medium"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
+            HEX
+          </label>
+          <input
+            value={hex}
+            onChange={e => handleHexInput(e.target.value)}
+            className="h-10 px-3 text-sm font-mono outline-none"
+            style={{
+              borderRadius: 'var(--radius-md)',
+              backgroundColor: 'var(--color-bg-tertiary)',
+              color: 'var(--color-text-primary)',
+            }}
+            onFocus={(e) => {
+              e.target.style.boxShadow = '0 0 0 2px var(--color-primary)'
+            }}
+            onBlur={(e) => {
+              e.target.style.boxShadow = 'none'
+            }}
+          />
         </div>
 
         {/* RGB 输入 */}
-        <div className="flex flex-col gap-2 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
-          <label className="text-xs font-medium text-gray-500">RGB</label>
+        <div
+          className="flex flex-col gap-2 p-4"
+          style={{
+            backgroundColor: 'var(--color-bg-base)',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid var(--color-border-light)',
+          }}
+        >
+          <label
+            className="text-xs font-medium"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
+            RGB
+          </label>
           <div className="grid grid-cols-3 gap-2">
             {['R', 'G', 'B'].map((ch, i) => (
               <div key={ch} className="flex flex-col gap-1">
-                <span className="text-[10px] text-gray-400 text-center">{ch}</span>
-                <input type="number" min={0} max={255} value={rgb[i]}
+                <span
+                  className="text-[10px] text-center"
+                  style={{ color: 'var(--color-text-tertiary)' }}
+                >
+                  {ch}
+                </span>
+                <input
+                  type="number"
+                  min={0}
+                  max={255}
+                  value={rgb[i]}
                   onChange={e => handleRgbChange(i, e.target.value)}
-                  className="h-9 px-2 rounded-xl bg-gray-100 text-sm text-center font-mono outline-none focus:ring-2 focus:ring-indigo-400" />
+                  className="h-9 px-2 text-sm text-center font-mono outline-none"
+                  style={{
+                    borderRadius: 'var(--radius-md)',
+                    backgroundColor: 'var(--color-bg-tertiary)',
+                    color: 'var(--color-text-primary)',
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.boxShadow = '0 0 0 2px var(--color-primary)'
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.boxShadow = 'none'
+                  }}
+                />
               </div>
             ))}
           </div>
         </div>
 
         {/* HSL 输入 */}
-        <div className="flex flex-col gap-2 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
-          <label className="text-xs font-medium text-gray-500">HSL</label>
+        <div
+          className="flex flex-col gap-2 p-4"
+          style={{
+            backgroundColor: 'var(--color-bg-base)',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid var(--color-border-light)',
+          }}
+        >
+          <label
+            className="text-xs font-medium"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
+            HSL
+          </label>
           <div className="grid grid-cols-3 gap-2">
             {[['H', 360], ['S', 100], ['L', 100]].map(([ch, max], i) => (
               <div key={ch} className="flex flex-col gap-1">
-                <span className="text-[10px] text-gray-400 text-center">{ch}</span>
-                <input type="number" min={0} max={max as number} value={hsl[i]}
+                <span
+                  className="text-[10px] text-center"
+                  style={{ color: 'var(--color-text-tertiary)' }}
+                >
+                  {ch}
+                </span>
+                <input
+                  type="number"
+                  min={0}
+                  max={max as number}
+                  value={hsl[i]}
                   onChange={e => handleHslChange(i, e.target.value)}
-                  className="h-9 px-2 rounded-xl bg-gray-100 text-sm text-center font-mono outline-none focus:ring-2 focus:ring-indigo-400" />
+                  className="h-9 px-2 text-sm text-center font-mono outline-none"
+                  style={{
+                    borderRadius: 'var(--radius-md)',
+                    backgroundColor: 'var(--color-bg-tertiary)',
+                    color: 'var(--color-text-primary)',
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.boxShadow = '0 0 0 2px var(--color-primary)'
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.boxShadow = 'none'
+                  }}
+                />
               </div>
             ))}
           </div>
@@ -128,14 +243,29 @@ export function ColorPickerPage() {
         {/* 一键复制 */}
         <div className="flex flex-col gap-2">
           {values.map(({ label, text }) => (
-            <button key={label} onClick={() => copy(label, text)}
-              className={cn(
-                'flex items-center justify-between px-4 py-3 rounded-xl border text-sm font-mono transition active:scale-95',
-                copied === label ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-white border-gray-100 text-gray-700 shadow-sm',
-              )}>
-              <span className="text-xs font-bold text-gray-400 w-10">{label}</span>
+            <button
+              key={label}
+              onClick={() => copy(label, text)}
+              className="flex items-center justify-between px-4 py-3 text-sm font-mono transition active:scale-95"
+              style={{
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--color-border-light)',
+                backgroundColor: copied === label ? 'var(--color-primary-light)' : 'var(--color-bg-base)',
+                color: copied === label ? 'var(--color-primary)' : 'var(--color-text-primary)',
+              }}
+            >
+              <span
+                className="text-xs font-bold w-10"
+                style={{ color: 'var(--color-text-tertiary)' }}
+              >
+                {label}
+              </span>
               <span className="flex-1 text-center">{text}</span>
-              {copied === label ? <Check className="size-4 text-emerald-500" /> : <Copy className="size-4 text-gray-400" />}
+              {copied === label ? (
+                <Check className="size-4" style={{ color: 'var(--color-primary)' }} />
+              ) : (
+                <Copy className="size-4" style={{ color: 'var(--color-text-tertiary)' }} />
+              )}
             </button>
           ))}
         </div>

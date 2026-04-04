@@ -17,11 +17,13 @@ export function CategoryFilter({ active, onChange, className }: CategoryFilterPr
       <button
         onClick={() => onChange('all')}
         className={cn(
-          'flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium transition',
-          active === 'all'
-            ? 'bg-indigo-600 text-white shadow-sm'
-            : 'bg-gray-100 text-gray-500 hover:bg-gray-200',
+          'flex-shrink-0 px-3.5 py-1.5 text-xs font-medium transition',
         )}
+        style={{
+          borderRadius: 'var(--radius-full)',
+          backgroundColor: active === 'all' ? 'var(--color-primary)' : 'var(--color-bg-tertiary)',
+          color: active === 'all' ? 'var(--color-text-inverse)' : 'var(--color-text-secondary)',
+        }}
       >
         全部
       </button>
@@ -30,12 +32,12 @@ export function CategoryFilter({ active, onChange, className }: CategoryFilterPr
         <button
           key={cat.key}
           onClick={() => onChange(cat.key)}
-          className={cn(
-            'flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium transition',
-            active === cat.key
-              ? 'bg-indigo-600 text-white shadow-sm'
-              : `${cat.color} ${cat.textColor} hover:opacity-80`,
-          )}
+          className="flex-shrink-0 px-3.5 py-1.5 text-xs font-medium transition"
+          style={{
+            borderRadius: 'var(--radius-full)',
+            backgroundColor: active === cat.key ? 'var(--color-primary)' : 'var(--color-primary-light)',
+            color: active === cat.key ? 'var(--color-text-inverse)' : 'var(--color-primary)',
+          }}
         >
           {cat.label}
         </button>

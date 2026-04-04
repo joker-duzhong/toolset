@@ -7,20 +7,20 @@ export const CATEGORIES: ToolCategoryInfo[] = [
   {
     key: 'image',
     label: '图片处理',
-    color: 'bg-violet-100',
-    textColor: 'text-violet-600',
+    color: 'bg-sky-100',
+    textColor: 'text-sky-600',
   },
   {
     key: 'text',
     label: '文本处理',
-    color: 'bg-blue-100',
-    textColor: 'text-blue-600',
+    color: 'bg-indigo-100',
+    textColor: 'text-indigo-600',
   },
   {
     key: 'convert',
     label: '格式转换',
-    color: 'bg-emerald-100',
-    textColor: 'text-emerald-600',
+    color: 'bg-teal-100',
+    textColor: 'text-teal-600',
   },
   {
     key: 'encode',
@@ -31,8 +31,8 @@ export const CATEGORIES: ToolCategoryInfo[] = [
   {
     key: 'life',
     label: '生活实用',
-    color: 'bg-pink-100',
-    textColor: 'text-pink-600',
+    color: 'bg-rose-100',
+    textColor: 'text-rose-600',
   },
   {
     key: 'dev',
@@ -43,14 +43,14 @@ export const CATEGORIES: ToolCategoryInfo[] = [
   {
     key: 'entertainment',
     label: '影音娱乐',
-    color: 'bg-rose-100',
-    textColor: 'text-rose-600',
+    color: 'bg-purple-100',
+    textColor: 'text-purple-600',
   },
   {
     key: 'finance',
     label: '金融理财',
-    color: 'bg-cyan-100',
-    textColor: 'text-cyan-600',
+    color: 'bg-emerald-100',
+    textColor: 'text-emerald-600',
   },
   {
     key: 'other',

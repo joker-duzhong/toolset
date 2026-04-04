@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Copy, Check, RefreshCw } from 'lucide-react'
 import { PageHeader } from '@/components/PageHeader'
-import { cn } from '@/utils/cn'
 
 const ZONES = [
   { label: '本地时间', offset: null },
@@ -59,36 +58,85 @@ export function TimestampPage() {
 
   const CopyBtn = ({ id, text }: { id: string; text: string }) => (
     <button onClick={() => copy(id, text)} className="active:scale-90 transition">
-      {copied === id ? <Check className="size-3.5 text-emerald-500" /> : <Copy className="size-3.5 text-gray-400" />}
+      {copied === id ? (
+        <Check className="size-3.5" style={{ color: 'var(--color-primary)' }} />
+      ) : (
+        <Copy className="size-3.5" style={{ color: 'var(--color-text-tertiary)' }} />
+      )}
     </button>
   )
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
       <PageHeader title="时间戳转换" />
       <main className="flex-1 px-4 py-5 flex flex-col gap-5">
 
         {/* 当前时间戳 */}
-        <div className="flex items-center justify-between p-4 bg-indigo-600 rounded-2xl text-white">
+        <div
+          className="flex items-center justify-between p-4 text-white"
+          style={{
+            background: 'linear-gradient(135deg, #0d99ff 0%, #0b87e0 100%)',
+            borderRadius: 'var(--radius-lg)',
+          }}
+        >
           <div>
             <p className="text-xs opacity-70">当前 Unix 时间戳（秒）</p>
             <p className="text-2xl font-bold tabular-nums mt-0.5">{nowTs}</p>
           </div>
-          <button onClick={() => copy('now', String(nowTs))} className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/20 text-xs font-medium active:scale-95 transition">
+          <button
+            onClick={() => copy('now', String(nowTs))}
+            className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium active:scale-95 transition"
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              borderRadius: 'var(--radius-md)',
+            }}
+          >
             {copied === 'now' ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
             复制
           </button>
         </div>
 
         {/* 时间戳 → 日期 */}
-        <div className="flex flex-col gap-3 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
-          <p className="text-xs font-semibold text-gray-600">时间戳 → 日期</p>
+        <div
+          className="flex flex-col gap-3 p-4"
+          style={{
+            backgroundColor: 'var(--color-bg-base)',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid var(--color-border-light)',
+          }}
+        >
+          <p
+            className="text-xs font-semibold"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
+            时间戳 → 日期
+          </p>
           <div className="flex gap-2">
-            <input value={tsInput} onChange={e => { setTsInput(e.target.value); setDateResult(null); setTsResult(null) }}
+            <input
+              value={tsInput}
+              onChange={e => { setTsInput(e.target.value); setDateResult(null); setTsResult(null) }}
               placeholder="输入时间戳（秒或毫秒）"
-              className="flex-1 h-10 px-3 rounded-xl bg-gray-100 text-sm font-mono outline-none focus:ring-2 focus:ring-indigo-400" />
-            <button onClick={handleTsConvert}
-              className="flex items-center justify-center px-4 rounded-xl bg-indigo-600 text-white active:scale-95 transition">
+              className="flex-1 h-10 px-3 text-sm font-mono outline-none"
+              style={{
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: 'var(--color-bg-tertiary)',
+                color: 'var(--color-text-primary)',
+              }}
+              onFocus={(e) => {
+                e.target.style.boxShadow = '0 0 0 2px var(--color-primary)'
+              }}
+              onBlur={(e) => {
+                e.target.style.boxShadow = 'none'
+              }}
+            />
+            <button
+              onClick={handleTsConvert}
+              className="flex items-center justify-center px-4 text-white active:scale-95 transition"
+              style={{
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: 'var(--color-primary)',
+              }}
+            >
               <RefreshCw className="size-4" />
             </button>
           </div>
@@ -97,10 +145,21 @@ export function TimestampPage() {
               {ZONES.map((z) => {
                 const val = formatDate(dateResult, z.offset)
                 return (
-                  <div key={z.label} className="flex items-center justify-between px-3 py-2.5 bg-gray-50 rounded-xl">
+                  <div
+                    key={z.label}
+                    className="flex items-center justify-between px-3 py-2.5"
+                    style={{
+                      backgroundColor: 'var(--color-bg-tertiary)',
+                      borderRadius: 'var(--radius-md)',
+                    }}
+                  >
                     <div>
-                      <p className="text-[10px] text-gray-400">{z.label}</p>
-                      <p className="text-sm font-mono text-gray-800">{val}</p>
+                      <p className="text-[10px]" style={{ color: 'var(--color-text-tertiary)' }}>
+                        {z.label}
+                      </p>
+                      <p className="text-sm font-mono" style={{ color: 'var(--color-text-primary)' }}>
+                        {val}
+                      </p>
                     </div>
                     <CopyBtn id={`zone-${z.label}`} text={val} />
                   </div>
@@ -111,13 +170,46 @@ export function TimestampPage() {
         </div>
 
         {/* 日期 → 时间戳 */}
-        <div className="flex flex-col gap-3 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
-          <p className="text-xs font-semibold text-gray-600">日期 → 时间戳</p>
+        <div
+          className="flex flex-col gap-3 p-4"
+          style={{
+            backgroundColor: 'var(--color-bg-base)',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid var(--color-border-light)',
+          }}
+        >
+          <p
+            className="text-xs font-semibold"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
+            日期 → 时间戳
+          </p>
           <div className="flex gap-2">
-            <input type="datetime-local" value={dateInput} onChange={e => { setDateInput(e.target.value); setTsResult(null) }}
-              className="flex-1 h-10 px-3 rounded-xl bg-gray-100 text-sm outline-none focus:ring-2 focus:ring-indigo-400" />
-            <button onClick={handleDateConvert}
-              className="flex items-center justify-center px-4 rounded-xl bg-indigo-600 text-white active:scale-95 transition">
+            <input
+              type="datetime-local"
+              value={dateInput}
+              onChange={e => { setDateInput(e.target.value); setTsResult(null) }}
+              className="flex-1 h-10 px-3 text-sm outline-none"
+              style={{
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: 'var(--color-bg-tertiary)',
+                color: 'var(--color-text-primary)',
+              }}
+              onFocus={(e) => {
+                e.target.style.boxShadow = '0 0 0 2px var(--color-primary)'
+              }}
+              onBlur={(e) => {
+                e.target.style.boxShadow = 'none'
+              }}
+            />
+            <button
+              onClick={handleDateConvert}
+              className="flex items-center justify-center px-4 text-white active:scale-95 transition"
+              style={{
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: 'var(--color-primary)',
+              }}
+            >
               <RefreshCw className="size-4" />
             </button>
           </div>
@@ -127,10 +219,21 @@ export function TimestampPage() {
                 { label: '秒级时间戳', value: String(tsResult.s) },
                 { label: '毫秒级时间戳', value: String(tsResult.ms) },
               ].map(({ label, value }) => (
-                <div key={label} className={cn('flex items-center justify-between px-3 py-2.5 bg-gray-50 rounded-xl')}>
+                <div
+                  key={label}
+                  className="flex items-center justify-between px-3 py-2.5"
+                  style={{
+                    backgroundColor: 'var(--color-bg-tertiary)',
+                    borderRadius: 'var(--radius-md)',
+                  }}
+                >
                   <div>
-                    <p className="text-[10px] text-gray-400">{label}</p>
-                    <p className="text-sm font-mono text-gray-800">{value}</p>
+                    <p className="text-[10px]" style={{ color: 'var(--color-text-tertiary)' }}>
+                      {label}
+                    </p>
+                    <p className="text-sm font-mono" style={{ color: 'var(--color-text-primary)' }}>
+                      {value}
+                    </p>
                   </div>
                   <CopyBtn id={label} text={value} />
                 </div>

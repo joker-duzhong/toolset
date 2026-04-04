@@ -22,14 +22,23 @@ export function PageHeader({
   return (
     <header
       className={cn(
-        'sticky top-0 z-10 flex items-center gap-3 px-4 py-3 bg-white/90 backdrop-blur border-b border-gray-100',
+        'sticky top-0 z-10 flex items-center gap-3 px-4 py-3',
         className,
       )}
+      style={{
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        backdropFilter: 'blur(8px)',
+        borderBottom: '1px solid var(--color-border-light)',
+      }}
     >
       {showBack && (
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center justify-center size-8 rounded-full hover:bg-gray-100 transition text-gray-600 active:scale-90"
+          className="flex items-center justify-center size-8 transition active:scale-90"
+          style={{
+            borderRadius: 'var(--radius-full)',
+            color: 'var(--color-text-primary)',
+          }}
           aria-label="返回"
         >
           <ArrowLeft className="size-5" />
@@ -37,11 +46,23 @@ export function PageHeader({
       )}
 
       <div className="flex-1 min-w-0">
-        <h1 className="text-base font-semibold text-gray-900 truncate">{title}</h1>
-        {subtitle && <p className="text-xs text-gray-500 truncate">{subtitle}</p>}
+        <h1
+          className="text-base font-semibold truncate"
+          style={{ color: 'var(--color-text-primary)' }}
+        >
+          {title}
+        </h1>
+        {subtitle && (
+          <p
+            className="text-xs truncate"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
+            {subtitle}
+          </p>
+        )}
       </div>
 
-      {rightSlot && <div className="flex-shrink-0">{rightSlot}</div>}
+      {rightSlot && <div className="shrink-0">{rightSlot}</div>}
     </header>
   )
 }

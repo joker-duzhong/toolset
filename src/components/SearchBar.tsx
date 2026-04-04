@@ -30,12 +30,29 @@ export function SearchBar({
 
   return (
     <div className={cn('relative flex items-center', className)}>
-      <Search className="absolute left-3 size-4 text-gray-400 pointer-events-none" />
+      <Search
+        className="absolute left-3 size-4 pointer-events-none"
+        style={{ color: 'var(--color-text-tertiary)' }}
+      />
       <input
         type="search"
         value={localValue}
         placeholder={placeholder}
-        className="w-full h-10 pl-9 pr-9 rounded-xl bg-gray-100 text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-indigo-400 transition"
+        className="w-full h-10 pl-9 pr-9 text-sm outline-none transition"
+        style={{
+          borderRadius: 'var(--radius-lg)',
+          backgroundColor: 'var(--color-bg-tertiary)',
+          color: 'var(--color-text-primary)',
+        }}
+        // 自定义placeholder样式
+        onFocus={(e) => {
+          e.target.style.backgroundColor = 'var(--color-bg-base)'
+          e.target.style.boxShadow = '0 0 0 2px var(--color-primary)'
+        }}
+        onBlur={(e) => {
+          e.target.style.backgroundColor = 'var(--color-bg-tertiary)'
+          e.target.style.boxShadow = 'none'
+        }}
         // 输入法合成开始（拼音打字期间）
         onCompositionStart={() => {
           isComposing.current = true
@@ -61,12 +78,6 @@ export function SearchBar({
             ;(e.target as HTMLInputElement).blur()
           }
         }}
-        // 失焦时提交（切换 Tab / 点击其他区域）
-        onBlur={() => {
-          if (!isComposing.current) {
-            commit(localValue)
-          }
-        }}
       />
       {localValue && (
         <button
@@ -74,7 +85,8 @@ export function SearchBar({
             setLocalValue('')
             commit('')
           }}
-          className="absolute right-3 text-gray-400 hover:text-gray-600 transition"
+          className="absolute right-3 transition"
+          style={{ color: 'var(--color-text-tertiary)' }}
           aria-label="清空搜索"
         >
           <X className="size-4" />

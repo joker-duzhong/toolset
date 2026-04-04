@@ -35,7 +35,7 @@ export function WordCountPage() {
   const stats = analyze(text)
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
       <PageHeader title="字数统计" />
       <main className="flex-1 px-4 py-5 flex flex-col gap-4">
         <textarea
@@ -43,14 +43,39 @@ export function WordCountPage() {
           onChange={e => setText(e.target.value)}
           placeholder="在此粘贴或输入文章内容…"
           rows={10}
-          className="w-full p-4 rounded-2xl bg-white border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-indigo-400 resize-none shadow-sm"
+          className="w-full p-4 text-sm outline-none resize-none"
+          style={{
+            borderRadius: 'var(--radius-lg)',
+            backgroundColor: 'var(--color-bg-base)',
+            border: '1px solid var(--color-border)',
+            color: 'var(--color-text-primary)',
+          }}
+          onFocus={(e) => {
+            e.target.style.boxShadow = '0 0 0 2px var(--color-primary)'
+          }}
+          onBlur={(e) => {
+            e.target.style.boxShadow = 'none'
+          }}
         />
 
         <div className="grid grid-cols-2 gap-3">
           {ITEMS.map(item => (
-            <div key={item.key} className="flex flex-col gap-0.5 p-3.5 bg-white rounded-2xl border border-gray-100 shadow-sm">
-              <p className="text-xs text-gray-400">{item.label}</p>
-              <p className="text-xl font-bold text-gray-800 tabular-nums">
+            <div
+              key={item.key}
+              className="flex flex-col gap-0.5 p-3.5"
+              style={{
+                backgroundColor: 'var(--color-bg-base)',
+                borderRadius: 'var(--radius-lg)',
+                border: '1px solid var(--color-border-light)',
+              }}
+            >
+              <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+                {item.label}
+              </p>
+              <p
+                className="text-xl font-bold tabular-nums"
+                style={{ color: 'var(--color-text-primary)' }}
+              >
                 {typeof stats[item.key] === 'number' ? stats[item.key].toLocaleString() : stats[item.key]}
               </p>
             </div>
@@ -60,7 +85,12 @@ export function WordCountPage() {
         {text && (
           <button
             onClick={() => setText('')}
-            className="w-full py-3 rounded-xl bg-gray-100 text-gray-500 text-sm active:scale-95 transition"
+            className="w-full py-3 text-sm active:scale-95 transition"
+            style={{
+              borderRadius: 'var(--radius-md)',
+              backgroundColor: 'var(--color-bg-tertiary)',
+              color: 'var(--color-text-secondary)',
+            }}
           >
             清空
           </button>

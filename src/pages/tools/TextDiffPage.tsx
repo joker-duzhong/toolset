@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { PageHeader } from '@/components/PageHeader'
-import { cn } from '@/utils/cn'
 
 interface DiffLine {
   type: 'equal' | 'add' | 'remove'
@@ -43,24 +42,62 @@ export function TextDiffPage() {
   const removeCount = diff?.filter(d => d.type === 'remove').length ?? 0
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
       <PageHeader title="文本对比" subtitle="逐行高亮差异" />
       <main className="flex-1 px-4 py-5 flex flex-col gap-4">
         <div className="grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-gray-500">原文本</label>
+            <label
+              className="text-xs font-medium"
+              style={{ color: 'var(--color-text-secondary)' }}
+            >
+              原文本
+            </label>
             <textarea
-              value={left} onChange={e => { setLeft(e.target.value); setDiff(null) }}
-              rows={8} placeholder="粘贴原始内容…"
-              className="w-full p-3 rounded-xl bg-white border border-gray-200 text-xs font-mono outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
+              value={left}
+              onChange={e => { setLeft(e.target.value); setDiff(null) }}
+              rows={8}
+              placeholder="粘贴原始内容…"
+              className="w-full p-3 text-xs font-mono outline-none resize-none"
+              style={{
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: 'var(--color-bg-base)',
+                border: '1px solid var(--color-border)',
+                color: 'var(--color-text-primary)',
+              }}
+              onFocus={(e) => {
+                e.target.style.boxShadow = '0 0 0 2px var(--color-primary)'
+              }}
+              onBlur={(e) => {
+                e.target.style.boxShadow = 'none'
+              }}
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-gray-500">新文本</label>
+            <label
+              className="text-xs font-medium"
+              style={{ color: 'var(--color-text-secondary)' }}
+            >
+              新文本
+            </label>
             <textarea
-              value={right} onChange={e => { setRight(e.target.value); setDiff(null) }}
-              rows={8} placeholder="粘贴修改后内容…"
-              className="w-full p-3 rounded-xl bg-white border border-gray-200 text-xs font-mono outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
+              value={right}
+              onChange={e => { setRight(e.target.value); setDiff(null) }}
+              rows={8}
+              placeholder="粘贴修改后内容…"
+              className="w-full p-3 text-xs font-mono outline-none resize-none"
+              style={{
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: 'var(--color-bg-base)',
+                border: '1px solid var(--color-border)',
+                color: 'var(--color-text-primary)',
+              }}
+              onFocus={(e) => {
+                e.target.style.boxShadow = '0 0 0 2px var(--color-primary)'
+              }}
+              onBlur={(e) => {
+                e.target.style.boxShadow = 'none'
+              }}
             />
           </div>
         </div>
@@ -68,7 +105,12 @@ export function TextDiffPage() {
         <button
           onClick={() => setDiff(diffLines(left, right))}
           disabled={!left && !right}
-          className="w-full py-3 rounded-xl bg-indigo-600 disabled:bg-gray-200 disabled:text-gray-400 text-white text-sm font-semibold active:scale-95 transition"
+          className="w-full py-3 text-sm font-semibold active:scale-95 transition disabled:active:scale-100"
+          style={{
+            borderRadius: 'var(--radius-md)',
+            backgroundColor: !left && !right ? 'var(--color-text-tertiary)' : 'var(--color-primary)',
+            color: 'var(--color-text-inverse)',
+          }}
         >
           对比
         </button>
@@ -76,21 +118,50 @@ export function TextDiffPage() {
         {diff && (
           <div className="flex flex-col gap-2">
             <div className="flex gap-2 text-xs">
-              <span className="px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 font-medium">+{addCount} 行新增</span>
-              <span className="px-2 py-1 rounded-full bg-rose-100 text-rose-700 font-medium">-{removeCount} 行删除</span>
+              <span
+                className="px-2 py-1 font-medium"
+                style={{
+                  borderRadius: 'var(--radius-full)',
+                  backgroundColor: '#E8F5E9',
+                  color: '#388E3C',
+                }}
+              >
+                +{addCount} 行新增
+              </span>
+              <span
+                className="px-2 py-1 font-medium"
+                style={{
+                  borderRadius: 'var(--radius-full)',
+                  backgroundColor: '#FFEBEE',
+                  color: '#D32F2F',
+                }}
+              >
+                -{removeCount} 行删除
+              </span>
             </div>
-            <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+            <div
+              className="overflow-hidden"
+              style={{
+                borderRadius: 'var(--radius-lg)',
+                border: '1px solid var(--color-border-light)',
+              }}
+            >
               {diff.map((line, i) => (
                 <div
                   key={i}
-                  className={cn(
-                    'flex items-start gap-2 px-3 py-1.5 text-xs font-mono',
-                    line.type === 'add' && 'bg-emerald-50 text-emerald-800',
-                    line.type === 'remove' && 'bg-rose-50 text-rose-800',
-                    line.type === 'equal' && 'bg-white text-gray-600',
-                  )}
+                  className="flex items-start gap-2 px-3 py-1.5 text-xs font-mono"
+                  style={{
+                    backgroundColor:
+                      line.type === 'add' ? '#E8F5E9' :
+                      line.type === 'remove' ? '#FFEBEE' :
+                      'var(--color-bg-base)',
+                    color:
+                      line.type === 'add' ? '#2E7D32' :
+                      line.type === 'remove' ? '#C62828' :
+                      'var(--color-text-secondary)',
+                  }}
                 >
-                  <span className="flex-shrink-0 w-4 text-center opacity-60">
+                  <span className="shrink-0 w-4 text-center opacity-60">
                     {line.type === 'add' ? '+' : line.type === 'remove' ? '-' : ' '}
                   </span>
                   <span className="break-all whitespace-pre-wrap">{line.text || ' '}</span>

@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { PageHeader } from '@/components/PageHeader'
-import { cn } from '@/utils/cn'
 
 interface AgeResult {
   years: number
@@ -62,36 +61,73 @@ export function AgeCalcPage() {
   const handleCalc = () => setResult(calcAge(birthday))
 
   const cards = result ? [
-    { label: '周岁', value: `${result.years} 岁`, color: 'bg-indigo-50 text-indigo-700' },
-    { label: '月数', value: `${result.months} 月`, color: 'bg-violet-50 text-violet-700' },
-    { label: '天数', value: `${result.days} 天`, color: 'bg-blue-50 text-blue-700' },
-    { label: '累计天数', value: `${result.totalDays.toLocaleString()} 天`, color: 'bg-sky-50 text-sky-700' },
-    { label: '下次生日', value: result.daysToNext === 0 ? '🎉 今天！' : `还有 ${result.daysToNext} 天`, color: 'bg-pink-50 text-pink-700' },
-    { label: '下次生日日期', value: result.nextBirthday, color: 'bg-rose-50 text-rose-700' },
-    { label: '星座', value: result.zodiac, color: 'bg-amber-50 text-amber-700' },
-    { label: '生肖', value: result.chineseZodiac, color: 'bg-emerald-50 text-emerald-700' },
+    { label: '周岁', value: `${result.years} 岁`, bg: '#e6f4ff', color: '#0d99ff' },
+    { label: '月数', value: `${result.months} 月`, bg: '#f0f9ff', color: '#0284c7' },
+    { label: '天数', value: `${result.days} 天`, bg: '#fff7ed', color: '#ea580c' },
+    { label: '累计天数', value: `${result.totalDays.toLocaleString()} 天`, bg: '#faf5ff', color: '#9333ea' },
+    { label: '下次生日', value: result.daysToNext === 0 ? '🎉 今天！' : `还有 ${result.daysToNext} 天`, bg: '#fdf2f8', color: '#db2777' },
+    { label: '下次生日日期', value: result.nextBirthday, bg: '#fef2f2', color: '#dc2626' },
+    { label: '星座', value: result.zodiac, bg: '#fefce8', color: '#ca8a04' },
+    { label: '生肖', value: result.chineseZodiac, bg: '#f0fdf4', color: '#16a34a' },
   ] : []
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
       <PageHeader title="年龄计算器" />
       <main className="flex-1 px-4 py-5 flex flex-col gap-4">
-        <div className="flex flex-col gap-1 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
-          <label className="text-xs font-medium text-gray-500">出生日期</label>
-          <input type="date" value={birthday} onChange={e => { setBirthday(e.target.value); setResult(null) }}
+        <div
+          className="flex flex-col gap-1 p-4"
+          style={{
+            backgroundColor: 'var(--color-bg-base)',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid var(--color-border-light)',
+          }}
+        >
+          <label
+            className="text-xs font-medium"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
+            出生日期
+          </label>
+          <input
+            type="date"
+            value={birthday}
+            onChange={e => { setBirthday(e.target.value); setResult(null) }}
             max={new Date().toISOString().split('T')[0]}
-            className="h-11 px-3 rounded-xl bg-gray-100 text-sm outline-none focus:ring-2 focus:ring-indigo-400" />
+            className="h-11 px-3 text-sm outline-none"
+            style={{
+              borderRadius: 'var(--radius-md)',
+              backgroundColor: 'var(--color-bg-tertiary)',
+              color: 'var(--color-text-primary)',
+            }}
+          />
         </div>
 
-        <button onClick={handleCalc} disabled={!birthday}
-          className="w-full py-3 rounded-xl bg-indigo-600 disabled:bg-gray-200 disabled:text-gray-400 text-white text-sm font-semibold active:scale-95 transition">
+        <button
+          onClick={handleCalc}
+          disabled={!birthday}
+          className="w-full py-3 text-sm font-semibold active:scale-95 transition disabled:active:scale-100"
+          style={{
+            borderRadius: 'var(--radius-md)',
+            backgroundColor: !birthday ? 'var(--color-text-tertiary)' : 'var(--color-primary)',
+            color: 'var(--color-text-inverse)',
+          }}
+        >
           计算
         </button>
 
         {result && (
           <div className="grid grid-cols-2 gap-3">
             {cards.map(card => (
-              <div key={card.label} className={cn('flex flex-col gap-0.5 p-3.5 rounded-2xl', card.color)}>
+              <div
+                key={card.label}
+                className="flex flex-col gap-0.5 p-3.5"
+                style={{
+                  backgroundColor: card.bg,
+                  borderRadius: 'var(--radius-lg)',
+                  color: card.color,
+                }}
+              >
                 <p className="text-xs opacity-70">{card.label}</p>
                 <p className="text-lg font-bold">{card.value}</p>
               </div>

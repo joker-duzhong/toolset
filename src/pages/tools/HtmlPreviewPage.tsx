@@ -11,7 +11,7 @@ const PLACEHOLDER = `<!DOCTYPE html>
     body {
       font-family: system-ui, sans-serif;
       padding: 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #0d99ff 0%, #0b87e0 100%);
       min-height: 100vh;
       margin: 0;
       display: flex;
@@ -35,7 +35,7 @@ const PLACEHOLDER = `<!DOCTYPE html>
       line-height: 1.6;
     }
     button {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #0d99ff 0%, #0b87e0 100%);
       color: white;
       border: none;
       padding: 12px 24px;
@@ -64,18 +64,27 @@ export function HtmlPreviewPage() {
   const [tab, setTab] = useState<'edit' | 'preview'>('edit')
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
       <PageHeader title="HTML 预览" />
       <main className="flex-1 flex flex-col px-4 py-4 gap-3">
         {/* 切换 tab */}
-        <div className="flex gap-1 p-1 bg-gray-100 rounded-xl">
+        <div
+          className="flex gap-1 p-1"
+          style={{
+            backgroundColor: 'var(--color-bg-tertiary)',
+            borderRadius: 'var(--radius-md)',
+          }}
+        >
           {(['edit', 'preview'] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`flex-1 py-2 rounded-lg text-xs font-semibold transition ${
-                tab === t ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500'
-              }`}
+              className="flex-1 py-2 text-xs font-semibold transition"
+              style={{
+                borderRadius: 'var(--radius-sm)',
+                backgroundColor: tab === t ? 'var(--color-bg-base)' : 'transparent',
+                color: tab === t ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+              }}
             >
               {t === 'edit' ? '✏️ 编辑' : '👁 预览'}
             </button>
@@ -86,13 +95,24 @@ export function HtmlPreviewPage() {
           <textarea
             value={code}
             onChange={e => setCode(e.target.value)}
-            className="flex-1 w-full p-4 rounded-2xl bg-white border border-gray-200 text-sm font-mono outline-none focus:ring-2 focus:ring-indigo-400 resize-none shadow-sm min-h-[60vh]"
+            className="flex-1 w-full p-4 text-sm font-mono outline-none resize-none min-h-[60vh]"
+            style={{
+              borderRadius: 'var(--radius-lg)',
+              backgroundColor: 'var(--color-bg-base)',
+              border: '1px solid var(--color-border)',
+              color: 'var(--color-text-primary)',
+            }}
             spellCheck={false}
           />
         ) : (
           <iframe
             srcDoc={code}
-            className="flex-1 w-full rounded-2xl bg-white border border-gray-100 shadow-sm min-h-[60vh]"
+            className="flex-1 w-full min-h-[60vh]"
+            style={{
+              borderRadius: 'var(--radius-lg)',
+              backgroundColor: 'var(--color-bg-base)',
+              border: '1px solid var(--color-border-light)',
+            }}
             sandbox="allow-scripts"
             title="HTML Preview"
           />

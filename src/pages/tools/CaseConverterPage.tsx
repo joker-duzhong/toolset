@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
 import { PageHeader } from '@/components/PageHeader'
-import { cn } from '@/utils/cn'
 
 // ── 转换函数 ────────────────────────────────────
 const toUpperCase = (s: string) => s.toUpperCase()
@@ -51,7 +50,7 @@ export function CaseConverterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
       <PageHeader title="大小写转换" subtitle="多种命名风格互转" />
       <main className="flex-1 px-4 py-5 flex flex-col gap-4">
         <textarea
@@ -59,26 +58,56 @@ export function CaseConverterPage() {
           onChange={e => setInput(e.target.value)}
           placeholder="输入任意文字或变量名…"
           rows={4}
-          className="w-full p-4 rounded-2xl bg-white border border-gray-200 text-sm font-mono outline-none focus:ring-2 focus:ring-indigo-400 resize-none shadow-sm"
+          className="w-full p-4 text-sm font-mono outline-none resize-none"
+          style={{
+            borderRadius: 'var(--radius-lg)',
+            backgroundColor: 'var(--color-bg-base)',
+            border: '1px solid var(--color-border)',
+            color: 'var(--color-text-primary)',
+          }}
+          onFocus={(e) => {
+            e.target.style.boxShadow = '0 0 0 2px var(--color-primary)'
+            e.target.style.borderColor = 'var(--color-primary)'
+          }}
+          onBlur={(e) => {
+            e.target.style.boxShadow = 'none'
+            e.target.style.borderColor = 'var(--color-border)'
+          }}
         />
 
         <div className="flex flex-col gap-2">
           {CONVERSIONS.map(({ id, label, fn }) => {
             const result = input ? fn(input) : ''
             return (
-              <div key={id} className="flex items-center gap-3 px-4 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
+              <div
+                key={id}
+                className="flex items-center gap-3 px-4 py-3"
+                style={{
+                  backgroundColor: 'var(--color-bg-base)',
+                  borderRadius: 'var(--radius-lg)',
+                  border: '1px solid var(--color-border-light)',
+                }}
+              >
                 <div className="flex-1 min-w-0">
-                  <p className="text-[10px] text-gray-400 mb-0.5">{label}</p>
-                  <p className={cn('text-sm font-mono truncate', input ? 'text-gray-800' : 'text-gray-300')}>
+                  <p className="text-[10px]" style={{ color: 'var(--color-text-tertiary)' }}>{label}</p>
+                  <p
+                    className="text-sm font-mono truncate"
+                    style={{ color: input ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}
+                  >
                     {result || '—'}
                   </p>
                 </div>
                 <button
                   onClick={() => copy(id, result)}
                   disabled={!result}
-                  className="flex-shrink-0 flex items-center gap-1 text-xs text-indigo-500 disabled:opacity-30 active:scale-90 transition"
+                  className="shrink-0 flex items-center gap-1 text-xs active:scale-90 transition disabled:opacity-30"
+                  style={{ color: 'var(--color-primary)' }}
                 >
-                  {copiedId === id ? <Check className="size-4 text-emerald-500" /> : <Copy className="size-4" />}
+                  {copiedId === id ? (
+                    <Check className="size-4" style={{ color: 'var(--color-primary)' }} />
+                  ) : (
+                    <Copy className="size-4" />
+                  )}
                 </button>
               </div>
             )

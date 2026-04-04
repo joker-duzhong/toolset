@@ -65,7 +65,10 @@ export function ToolPage({
   }
 
   return (
-    <div className={cn('min-h-screen bg-gray-50 flex flex-col', className)}>
+    <div
+      className={cn('min-h-screen flex flex-col', className)}
+      style={{ backgroundColor: 'var(--color-bg-secondary)' }}
+    >
       {showHeader && <PageHeader title={pageTitle} subtitle={subtitle} />}
       <main className="flex-1 flex flex-col">{children}</main>
     </div>
