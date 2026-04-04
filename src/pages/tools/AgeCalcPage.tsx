@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { PageHeader } from '@/components/PageHeader'
 
 interface AgeResult {
   years: number
@@ -72,9 +71,7 @@ export function AgeCalcPage() {
   ] : []
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
-      <PageHeader title="年龄计算器" />
-      <main className="flex-1 px-4 py-5 flex flex-col gap-4">
+    <main className="h-full overflow-auto px-4 py-5 flex flex-col gap-4" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
         <div
           className="flex flex-col gap-1 p-4"
           style={{
@@ -134,7 +131,6 @@ export function AgeCalcPage() {
             ))}
           </div>
         )}
-      </main>
-    </div>
+    </main>
   )
 }

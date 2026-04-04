@@ -33,7 +33,7 @@ const APP_KEY = 'hope_trade_copilot'
 /** 统一注入 app header */
 function withAppHeader(init?: RequestInit): RequestInit {
   const headers = new Headers(init?.headers)
-  headers.set('X-App', APP_KEY)
+  headers.set('app', APP_KEY)
   return { ...init, headers }
 }
 

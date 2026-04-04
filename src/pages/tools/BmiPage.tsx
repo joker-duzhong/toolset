@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { PageHeader } from '@/components/PageHeader'
 
 interface BmiResult {
   bmi: number
@@ -30,10 +29,7 @@ export function BmiPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
-      <PageHeader title="BMI 计算器" subtitle="体重指数评估" />
-
-      <main className="flex-1 px-4 py-5 flex flex-col gap-4">
+    <main className="h-full overflow-auto px-4 py-5 flex flex-col gap-4">
         <div
           className="flex flex-col gap-3 p-4"
           style={{
@@ -162,7 +158,6 @@ export function BmiPage() {
             </div>
           </div>
         )}
-      </main>
-    </div>
+    </main>
   )
 }

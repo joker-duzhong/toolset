@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { PageHeader } from '@/components/PageHeader'
 
 interface Match {
   index: number
@@ -43,9 +42,7 @@ export function RegexTestPage() {
   const ALL_FLAGS = ['g', 'i', 'm', 's']
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
-      <PageHeader title="正则表达式测试" />
-      <main className="flex-1 px-4 py-5 flex flex-col gap-4">
+    <main className="h-full overflow-auto px-4 py-5 flex flex-col gap-4" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
         {/* 正则输入 */}
         <div
           className="flex flex-col gap-2 p-4"
@@ -230,7 +227,6 @@ export function RegexTestPage() {
             ))}
           </div>
         )}
-      </main>
-    </div>
+    </main>
   )
 }

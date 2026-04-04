@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Copy, Check, RefreshCw } from 'lucide-react'
-import { PageHeader } from '@/components/PageHeader'
 
 const ZONES = [
   { label: '本地时间', offset: null },
@@ -67,9 +66,7 @@ export function TimestampPage() {
   )
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
-      <PageHeader title="时间戳转换" />
-      <main className="flex-1 px-4 py-5 flex flex-col gap-5">
+    <main className="h-full overflow-auto px-4 py-5 flex flex-col gap-5" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
 
         {/* 当前时间戳 */}
         <div
@@ -241,7 +238,6 @@ export function TimestampPage() {
             </div>
           )}
         </div>
-      </main>
-    </div>
+    </main>
   )
 }

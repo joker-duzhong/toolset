@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react'
 import { Copy, Check } from 'lucide-react'
-import { PageHeader } from '@/components/PageHeader'
 
 // ── 转换工具函数 ──────────────────────────────────
 function hexToRgb(hex: string): [number, number, number] | null {
@@ -74,9 +73,7 @@ export function ColorPickerPage() {
   ]
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
-      <PageHeader title="颜色工具" subtitle="HEX / RGB / HSL 互转" />
-      <main className="flex-1 px-4 py-5 flex flex-col gap-4">
+    <main className="h-full overflow-auto px-4 py-5 flex flex-col gap-4">
         {/* 色块预览 */}
         <div
           className="h-28 transition-all"
@@ -269,7 +266,6 @@ export function ColorPickerPage() {
             </button>
           ))}
         </div>
-      </main>
-    </div>
+    </main>
   )
 }

@@ -1,6 +1,5 @@
 ﻿import { useRef, useState, useEffect, useCallback } from 'react'
 import { Upload, Download, RotateCcw, Paintbrush, Eye, EyeOff, Info, Eraser } from 'lucide-react'
-import { PageHeader } from '@/components/PageHeader'
 import { cn } from '@/utils/cn'
 
 // ─── 高级 Inpainting 修复算法 ─────────────────────────────────────────────────
@@ -688,9 +687,7 @@ export function WatermarkRemoverPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <PageHeader title="去水印" subtitle="手动涂抹 · 内容感知修复" />
-      <main className="flex-1 px-4 py-4 flex flex-col gap-4">
+    <main className="h-full overflow-auto px-4 py-4 flex flex-col gap-4" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
 
         {/* 说明 */}
         <div className="flex items-start gap-2 p-3 rounded-xl bg-blue-50 border border-blue-100 text-xs text-blue-700">
@@ -807,7 +804,6 @@ export function WatermarkRemoverPage() {
         {/* 隐藏的功能 canvas */}
         <canvas ref={maskCanvasRef} className="hidden" />
         <canvas ref={outputCanvasRef} className="hidden" />
-      </main>
-    </div>
+    </main>
   )
 }

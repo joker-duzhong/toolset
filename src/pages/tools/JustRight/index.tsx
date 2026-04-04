@@ -349,7 +349,7 @@ export function JustRightPage() {
   // 加载状态
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50/50 to-rose-50/30 flex items-center justify-center">
+      <div className="h-full bg-gradient-to-b from-amber-50/50 to-rose-50/30 flex items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-3 animate-pulse">💕</div>
           <p className="text-stone-500">加载中...</p>
@@ -361,7 +361,7 @@ export function JustRightPage() {
   // 错误状态
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50/50 to-rose-50/30 flex items-center justify-center">
+      <div className="h-full bg-gradient-to-b from-amber-50/50 to-rose-50/30 flex items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-3">😢</div>
           <p className="text-stone-500">{error}</p>
@@ -431,7 +431,7 @@ export function JustRightPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50/50 to-rose-50/30">
+    <div className="h-full bg-gradient-to-b from-amber-50/50 to-rose-50/30 flex flex-col">
       {/* 主内容区域 */}
       <main className="pb-20">{renderView()}</main>
 

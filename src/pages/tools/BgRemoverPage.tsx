@@ -1,7 +1,6 @@
 import { useRef, useState, useCallback } from 'react'
 import { removeBackground } from '@imgly/background-removal'
 import { Upload, Download, RotateCcw, Info, Eye, EyeOff, ImageDown } from 'lucide-react'
-import { PageHeader } from '@/components/PageHeader'
 import { cn } from '@/utils/cn'
 
 type Tab = 'original' | 'result'
@@ -94,9 +93,7 @@ export function BgRemoverPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <PageHeader title="抠图 / 去背景" subtitle="AI 驱动 · 一键透明" />
-      <main className="flex-1 px-4 py-4 flex flex-col gap-4">
+    <main className="h-full overflow-auto px-4 py-4 flex flex-col gap-4">
 
         {/* 说明 */}
         <div className="flex items-start gap-2 p-3 rounded-xl bg-blue-50 border border-blue-100 text-xs text-blue-700">
@@ -235,7 +232,6 @@ export function BgRemoverPage() {
             )}
           </>
         )}
-      </main>
-    </div>
+    </main>
   )
 }

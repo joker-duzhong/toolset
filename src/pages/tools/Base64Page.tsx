@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
-import { PageHeader } from '@/components/PageHeader'
 
 const toBase64 = (str: string) => {
   try {
@@ -37,10 +36,7 @@ export function Base64Page() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
-      <PageHeader title="Base64 编解码" />
-
-      <main className="flex-1 px-4 py-5 flex flex-col gap-4">
+    <main className="h-full overflow-auto px-4 py-5 flex flex-col gap-4">
         <div
           className="flex gap-2 p-1"
           style={{
@@ -130,7 +126,6 @@ export function Base64Page() {
             />
           </div>
         )}
-      </main>
-    </div>
+    </main>
   )
 }

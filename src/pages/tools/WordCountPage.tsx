@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { PageHeader } from '@/components/PageHeader'
 
 interface Stats {
   chars: number
@@ -35,9 +34,7 @@ export function WordCountPage() {
   const stats = analyze(text)
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
-      <PageHeader title="字数统计" />
-      <main className="flex-1 px-4 py-5 flex flex-col gap-4">
+    <main className="h-full overflow-auto px-4 py-5 flex flex-col gap-4" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
         <textarea
           value={text}
           onChange={e => setText(e.target.value)}
@@ -95,7 +92,6 @@ export function WordCountPage() {
             清空
           </button>
         )}
-      </main>
-    </div>
+    </main>
   )
 }

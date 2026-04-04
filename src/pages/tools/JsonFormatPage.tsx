@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
-import { PageHeader } from '@/components/PageHeader'
 
 export function JsonFormatPage() {
   const [input, setInput] = useState('')
@@ -33,10 +32,7 @@ export function JsonFormatPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
-      <PageHeader title="JSON 格式化" subtitle="格式化 / 压缩 / 校验" />
-
-      <main className="flex-1 px-4 py-5 flex flex-col gap-4">
+    <main className="h-full overflow-auto px-4 py-5 flex flex-col gap-4">
         {/* 模式切换 */}
         <div
           className="flex gap-2 p-1"
@@ -149,7 +145,6 @@ export function JsonFormatPage() {
             </pre>
           </div>
         )}
-      </main>
-    </div>
+    </main>
   )
 }

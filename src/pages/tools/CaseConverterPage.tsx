@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
-import { PageHeader } from '@/components/PageHeader'
 
 // ── 转换函数 ────────────────────────────────────
 const toUpperCase = (s: string) => s.toUpperCase()
@@ -50,9 +49,7 @@ export function CaseConverterPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
-      <PageHeader title="大小写转换" subtitle="多种命名风格互转" />
-      <main className="flex-1 px-4 py-5 flex flex-col gap-4">
+    <main className="h-full overflow-auto px-4 py-5 flex flex-col gap-4" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
         <textarea
           value={input}
           onChange={e => setInput(e.target.value)}
@@ -113,7 +110,6 @@ export function CaseConverterPage() {
             )
           })}
         </div>
-      </main>
-    </div>
+    </main>
   )
 }

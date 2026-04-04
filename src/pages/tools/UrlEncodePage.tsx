@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
-import { PageHeader } from '@/components/PageHeader'
 
 const encode = (s: string) => { try { return encodeURIComponent(s) } catch { return '编码失败' } }
 const decode = (s: string) => { try { return decodeURIComponent(s) } catch { return '解码失败，请检查输入' } }
@@ -20,9 +19,7 @@ export function UrlEncodePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
-      <PageHeader title="URL 编解码" />
-      <main className="flex-1 px-4 py-5 flex flex-col gap-4">
+    <main className="h-full overflow-auto px-4 py-5 flex flex-col gap-4" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
         <div
           className="flex gap-2 p-1"
           style={{
@@ -114,7 +111,6 @@ export function UrlEncodePage() {
             />
           </div>
         )}
-      </main>
-    </div>
+    </main>
   )
 }

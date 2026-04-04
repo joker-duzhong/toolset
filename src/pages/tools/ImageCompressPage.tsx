@@ -1,7 +1,6 @@
 ﻿import { useRef, useState } from 'react'
 import imageCompression from 'browser-image-compression'
 import { Upload, Download, RotateCcw, Info } from 'lucide-react'
-import { PageHeader } from '@/components/PageHeader'
 import { cn } from '@/utils/cn'
 
 function formatBytes(bytes: number) {
@@ -85,9 +84,7 @@ export function ImageCompressPage() {
   const isPng = file?.type === 'image/png'
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <PageHeader title="图片压缩" subtitle="JPG / PNG / WebP" />
-      <main className="flex-1 px-4 py-5 flex flex-col gap-4">
+    <main className="h-full overflow-auto px-4 py-5 flex flex-col gap-4">
 
         {isPng && outputFormat !== 'image/webp' && (
           <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-100 text-xs text-amber-700">
@@ -222,7 +219,6 @@ export function ImageCompressPage() {
             </div>
           </div>
         )}
-      </main>
-    </div>
+    </main>
   )
 }

@@ -106,7 +106,8 @@ export function AppRouter() {
 
   return (
     <BrowserRouter>
-      <Routes>
+      <div className="h-full">
+        <Routes>
         {/* 首页 */}
         <Route path="/" element={<HomePage />} />
 
@@ -218,7 +219,8 @@ export function AppRouter() {
 
         {/* 兜底重定向 */}
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+        </Routes>
+      </div>
     </BrowserRouter>
   )
 }

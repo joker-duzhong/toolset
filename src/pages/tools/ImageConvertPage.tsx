@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react'
 import { Upload, Download, RotateCcw } from 'lucide-react'
-import { PageHeader } from '@/components/PageHeader'
 import { cn } from '@/utils/cn'
 
 type Format = 'image/jpeg' | 'image/png' | 'image/webp'
@@ -47,9 +46,7 @@ export function ImageConvertPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <PageHeader title="图片格式转换" subtitle="JPG / PNG / WebP 互转" />
-      <main className="flex-1 px-4 py-5 flex flex-col gap-4">
+    <main className="h-full overflow-auto px-4 py-5 flex flex-col gap-4 bg-gray-50">
         <div
           onClick={() => !srcUrl && fileInputRef.current?.click()}
           className={cn(
@@ -109,7 +106,6 @@ export function ImageConvertPage() {
             </div>
           </div>
         )}
-      </main>
-    </div>
+    </main>
   )
 }

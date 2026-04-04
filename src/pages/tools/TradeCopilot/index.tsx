@@ -5,7 +5,6 @@
 // ────────────────────────────────────────────────
 
 import { useState } from 'react'
-import { PageHeader } from '@/components/PageHeader'
 import { BottomNav } from './components/BottomNav'
 import { type TabKey } from './constants'
 import { DashboardView } from './views/DashboardView'
@@ -14,18 +13,8 @@ import { WatchlistView } from './views/WatchlistView'
 import { StrategiesView } from './views/StrategiesView'
 import { JournalsView } from './views/JournalsView'
 
-const TAB_TITLES: Record<TabKey, string> = {
-  dashboard: 'Trade Copilot',
-  positions: '持仓管理',
-  watchlist: '观察池',
-  strategies: '策略管理',
-  journals: '交易日记',
-}
-
 export function TradeCopilotPage() {
   const [activeTab, setActiveTab] = useState<TabKey>('dashboard')
-
-  const handleTitle = TAB_TITLES[activeTab]
 
   const renderView = () => {
     switch (activeTab) {
@@ -43,10 +32,7 @@ export function TradeCopilotPage() {
   }
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
-      {/* 顶部 Header */}
-      <PageHeader title={handleTitle} showBack={true} />
-
+    <div className="h-full bg-gray-50 flex flex-col overflow-hidden">
       {/* 主体内容 */}
       <main className="flex-1 overflow-y-auto">
         <div className="px-4 py-3">

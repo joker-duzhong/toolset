@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { PageHeader } from '@/components/PageHeader'
 
 const PLACEHOLDER = `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -64,9 +63,7 @@ export function HtmlPreviewPage() {
   const [tab, setTab] = useState<'edit' | 'preview'>('edit')
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
-      <PageHeader title="HTML 预览" />
-      <main className="flex-1 flex flex-col px-4 py-4 gap-3">
+    <main className="h-full overflow-auto flex flex-col px-4 py-4 gap-3" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
         {/* 切换 tab */}
         <div
           className="flex gap-1 p-1"
@@ -117,7 +114,6 @@ export function HtmlPreviewPage() {
             title="HTML Preview"
           />
         )}
-      </main>
-    </div>
+    </main>
   )
 }

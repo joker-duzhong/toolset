@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import QRCode from 'qrcode'
 import { Download } from 'lucide-react'
-import { PageHeader } from '@/components/PageHeader'
 
 const COLORS = ['#212121', '#0d99ff', '#8b5cf6', '#ec4899', '#f97316', '#795548']
 
@@ -32,9 +31,7 @@ export function QrCodePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
-      <PageHeader title="二维码生成" />
-      <main className="flex-1 px-4 py-5 flex flex-col gap-4">
+    <main className="h-full overflow-auto px-4 py-5 flex flex-col gap-4" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
         <div className="flex flex-col gap-1">
           <label
             className="text-xs font-medium"
@@ -143,7 +140,6 @@ export function QrCodePage() {
           <Download className="size-4" />
           保存二维码
         </button>
-      </main>
-    </div>
+    </main>
   )
 }

@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react'
 import { Upload, RotateCcw, Plus, Minus, Info } from 'lucide-react'
-import { PageHeader } from '@/components/PageHeader'
 import { cn } from '@/utils/cn'
 
 // ── 图像处理核心（截面斑点检测 v2）──────────────────────────────────────────
@@ -225,9 +224,7 @@ export function SkewersCountPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <PageHeader title="串串计数" subtitle="拍照识别签子截面数量" />
-      <main className="flex-1 px-4 py-5 flex flex-col gap-4">
+    <main className="h-full overflow-auto px-4 py-5 flex flex-col gap-4" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
 
         {/* 提示 */}
         <div className="flex items-start gap-2 p-3 rounded-xl bg-blue-50 border border-blue-100 text-xs text-blue-700">
@@ -336,7 +333,6 @@ export function SkewersCountPage() {
         )}
 
         <input ref={fileInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFile} />
-      </main>
-    </div>
+    </main>
   )
 }

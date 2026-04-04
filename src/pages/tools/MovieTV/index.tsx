@@ -6,7 +6,6 @@
 // ────────────────────────────────────────────────
 
 import { useState, useCallback, useRef } from 'react'
-import { PageHeader } from '@/components/PageHeader'
 import { BottomNav, type TabKey } from './components/BottomNav'
 import { SideNav } from './components/SideNav'
 import { MovieHomeView } from './views/MovieHomeView'
@@ -93,7 +92,7 @@ export function MovieTVPage() {
   // 如果在详情页
   if (detailId) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="h-full bg-gray-50 flex flex-col">
         <MovieDetailView
           movieId={detailId}
           onBack={handleBack}
@@ -105,30 +104,11 @@ export function MovieTVPage() {
     )
   }
 
-  // Tab 页面标题
-  const tabTitles: Record<TabKey, string> = {
-    home: '影视大全',
-    category: '分类浏览',
-    search: '搜索',
-    mine: '我的',
-  }
-
   return (
-    <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
-      {/* 顶部 Header - 移动端显示 */}
-      <div className="lg:hidden">
-        <PageHeader title={tabTitles[activeTab]} showBack={true} />
-      </div>
-
+    <div className="h-full bg-gray-50 flex flex-col overflow-hidden">
       {/* PC 端：顶部导航栏 */}
-      <div className="hidden lg:block">
-        <PageHeader
-          title="影视大全"
-          showBack={true}
-          rightSlot={
-            <SideNav active={activeTab} onChange={setActiveTab} layout="horizontal" />
-          }
-        />
+      <div className="hidden lg:block px-4 py-2 border-b border-gray-200 bg-white">
+        <SideNav active={activeTab} onChange={setActiveTab} layout="horizontal" />
       </div>
 
       <div className="flex flex-1 overflow-hidden">

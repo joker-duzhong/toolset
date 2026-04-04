@@ -43,6 +43,9 @@ export function useToolSearch() {
     const keyword = query.trim().toLowerCase()
 
     return TOOLS.filter((tool) => {
+      // 过滤隐藏工具
+      if (tool.hidden) return false
+
       // 过滤分类
       if (activeCategory !== 'all' && tool.category !== activeCategory) return false
 

@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { PageHeader } from '@/components/PageHeader'
 
 interface DiffLine {
   type: 'equal' | 'add' | 'remove'
@@ -42,9 +41,7 @@ export function TextDiffPage() {
   const removeCount = diff?.filter(d => d.type === 'remove').length ?? 0
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
-      <PageHeader title="文本对比" subtitle="逐行高亮差异" />
-      <main className="flex-1 px-4 py-5 flex flex-col gap-4">
+    <main className="h-full overflow-auto px-4 py-5 flex flex-col gap-4" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
         <div className="grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-1">
             <label
@@ -170,7 +167,6 @@ export function TextDiffPage() {
             </div>
           </div>
         )}
-      </main>
-    </div>
+    </main>
   )
 }

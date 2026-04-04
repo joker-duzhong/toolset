@@ -24,7 +24,8 @@ interface ToolPageProps {
  * 自动功能：
  * 1. 根据路由路径匹配工具配置，设置页面标题
  * 2. 根据 hidden 属性决定是否显示导航栏
- * 3. 组件卸载时恢复默认标题
+ * 3. 使用 flex 布局，内容区域 flex-1 自适应高度
+ * 4. 组件卸载时恢复默认标题
  */
 export function ToolPage({
   children,
@@ -59,18 +60,24 @@ export function ToolPage({
     }
   }, [pageTitle])
 
-  // 全屏模式：直接渲染内容
+  // 全屏模式：直接渲染内容，使用 h-full
   if (fullscreen) {
-    return <>{children}</>
+    return (
+      <div className={cn('h-full', className)}>
+        {children}
+      </div>
+    )
   }
 
   return (
     <div
-      className={cn('min-h-screen flex flex-col', className)}
+      className={cn('h-full flex flex-col', className)}
       style={{ backgroundColor: 'var(--color-bg-secondary)' }}
     >
       {showHeader && <PageHeader title={pageTitle} subtitle={subtitle} />}
-      <main className="flex-1 flex flex-col">{children}</main>
+      <main className="flex-1 min-h-0 overflow-auto">
+        {children}
+      </main>
     </div>
   )
 }
