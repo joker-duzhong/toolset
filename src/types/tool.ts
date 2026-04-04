@@ -27,4 +27,5 @@ export interface ToolItem {
   isNew?: boolean      // 新上线标记
   isHot?: boolean      // 热门标记
   disabled?: boolean   // 即将上线
+  hidden?: boolean     // 隐藏工具（不在首页展示，但可直接访问）
 }

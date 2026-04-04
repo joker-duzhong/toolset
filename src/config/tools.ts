@@ -285,4 +285,18 @@ export const TOOLS: ToolItem[] = [
     isNew: true,
   },
 
+  // ── 情侣互动 ──────────────────────────────────
+  {
+    id: 'justright',
+    name: '恰好',
+    description: '情侣专属温馨小工具，清单备忘、说明书、心愿单、纪念日',
+    category: 'life',
+    icon: 'Heart',
+    path: '/tools/justright',
+    tags: ['情侣', '恋爱', '纪念日', '心愿单', '说明书'],
+    isNew: true,
+    isHot: true,
+    hidden: true,  // 隐藏工具，直接访问路径可用
+  },
+
 ]
