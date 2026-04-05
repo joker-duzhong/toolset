@@ -57,7 +57,7 @@ export const todoApi = {
 
   updateStatus: (id: number, status: "pending" | "completed") =>
     apiClient<TodoItem>(
-      `${BASE}/todos/${id}/status`,
+      `${BASE}/todos/${id}`,
       withAppHeader({
         method: "PUT",
         body: JSON.stringify({ status }),
@@ -99,7 +99,7 @@ export const manualApi = {
 
   update: (data: Partial<UserManual>) =>
     apiClient<UserManual>(
-      `${BASE}/manuals`,
+      `${BASE}/manuals/me`,
       withAppHeader({
         method: "PUT",
         body: JSON.stringify(data),
@@ -174,7 +174,7 @@ export const coupleStateApi = {
 
   updateMood: (mood: UserState["mood"], moodNote?: string) =>
     apiClient<UserState>(
-      `${BASE}/state/mood`,
+      `${BASE}/state`,
       withAppHeader({
         method: "PUT",
         body: JSON.stringify({ mood, mood_note: moodNote }),
@@ -183,7 +183,7 @@ export const coupleStateApi = {
 
   updateFridgeNote: (note: string) =>
     apiClient<CoupleState>(
-      `${BASE}/state/fridge-note`,
+      `${BASE}/state/fridge`,
       withAppHeader({
         method: "PUT",
         body: JSON.stringify({ fridge_note: note }),
