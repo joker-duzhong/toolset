@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { lazy, Suspense, ComponentType } from 'react'
+import { lazy, Suspense } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { AuthLoadingScreen } from '@/components/AuthLoadingScreen'
 import { ToolPage } from '@/components/ToolPage'

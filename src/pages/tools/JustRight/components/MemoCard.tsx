@@ -6,7 +6,7 @@ import type { Memo } from '../types'
 
 interface MemoCardProps {
   memo: Memo
-  onDelete: (id: string) => void
+  onDelete: (id: number) => void
 }
 
 export function MemoCard({ memo, onDelete }: MemoCardProps) {

@@ -11,8 +11,6 @@ interface HomeViewProps {
   data: HomeData
   myState: UserState
   partnerState: UserState
-  currentUserId: number
-  partnerId: number
   onUpdateMood: (mood: UserState['mood'], moodNote?: string) => void
   onUpdateFridgeNote: (note: string) => void
   onRaiseFlag: () => void
@@ -23,17 +21,14 @@ export function HomeView({
   data,
   myState,
   partnerState,
-  currentUserId,
-  partnerId,
   onUpdateMood,
   onUpdateFridgeNote,
   onRaiseFlag,
   onLowerFlag,
 }: HomeViewProps) {
   const [showMoodPicker, setShowMoodPicker] = useState(false)
-  const [showWhiteFlag, setShowWhiteFlag] = useState(false)
 
-  const { couple, together_days, upcoming_anniversaries, state } = data
+  const { together_days, upcoming_anniversaries, state } = data
 
   // 获取最近一个即将到来的纪念日
   const nextAnniversary = upcoming_anniversaries[0]

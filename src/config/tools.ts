@@ -296,7 +296,6 @@ export const TOOLS: ToolItem[] = [
     tags: ['情侣', '恋爱', '纪念日', '心愿单', '说明书'],
     isNew: true,
     isHot: true,
-    hidden: true,  // 隐藏工具，直接访问路径可用
   },
 
 ]

@@ -119,6 +119,7 @@ export interface Anniversary {
   couple_id: number
   title: string
   target_date: string
+  type: 'countup' | 'countdown'
   repeat_type: 'yearly' | 'monthly' | 'once'
   is_lunar: boolean
   icon?: string

@@ -24,18 +24,9 @@ import {
   rouletteApi,
   wishlistApi,
   coupleStateApi,
+  coupleApi,
 } from './services/api'
-
-// 简化 API 调用的别名
-const api = {
-  homeApi,
-  todoApi,
-  memoApi,
-  manualApi,
-  rouletteApi,
-  wishlistApi,
-  coupleStateApi,
-}
+import { CoupleBindView } from './views/CoupleBindView'
 
 // ============ 空数据默认值 ============
 const emptyHomeData: HomeData = {
@@ -70,6 +61,7 @@ export function JustRightPage() {
   const [activeTab, setActiveTab] = useState<MainTab>('home')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isBound, setIsBound] = useState<boolean | null>(null) // null 表示未检查
 
   // 状态数据
   const [homeData, setHomeData] = useState<HomeData>(emptyHomeData)
@@ -80,7 +72,6 @@ export function JustRightPage() {
 
   // 当前用户 ID (用于判断身份)
   const currentUserId = homeData.manuals.mine.uid
-  const partnerId = homeData.manuals.partner.uid
 
   // 判断当前用户是 user1 还是 user2
   const isUser1 = homeData.couple.user1_id === currentUserId
@@ -96,6 +87,19 @@ export function JustRightPage() {
     try {
       setLoading(true)
       setError(null)
+
+      // 先检查情侣绑定状态
+      const coupleRes = await coupleApi.get()
+      const couple = coupleRes.data
+
+      // 判断是否已绑定（status 为 active 且有 user2_id）
+      if (!couple || couple.status !== 'active' || !couple.user2_id) {
+        setIsBound(false)
+        setLoading(false)
+        return
+      }
+
+      setIsBound(true)
 
       // 并行加载所有数据
       const [homeRes, todoRes, memoRes, rouletteRes, wishRes] = await Promise.all([
@@ -113,7 +117,13 @@ export function JustRightPage() {
       setWishlist(wishRes.data || [])
     } catch (err) {
       console.error('Failed to load data:', err)
-      setError('加载数据失败，请稍后重试')
+      // 如果是 404 或未绑定错误，显示绑定界面
+      const errMsg = String(err)
+      if (errMsg.includes('404') || errMsg.includes('not found')) {
+        setIsBound(false)
+      } else {
+        setError('加载数据失败，请稍后重试')
+      }
     } finally {
       setLoading(false)
     }
@@ -124,7 +134,7 @@ export function JustRightPage() {
     try {
       const res = await todoApi.create(content)
       if (res.data) {
-        setTodos((prev) => [res.data, ...prev])
+        setTodos((prev) => [res.data!, ...prev])
         setHomeData((prev) => ({ ...prev, pending_todos: prev.pending_todos + 1 }))
       }
     } catch (err) {
@@ -162,7 +172,7 @@ export function JustRightPage() {
     try {
       const res = await memoApi.create(content, images)
       if (res.data) {
-        setMemos((prev) => [res.data, ...prev])
+        setMemos((prev) => [res.data!, ...prev])
       }
     } catch (err) {
       console.error('Failed to add memo:', err)
@@ -346,6 +356,12 @@ export function JustRightPage() {
     }
   }, [])
 
+  // 绑定成功后重新加载数据
+  const handleBindSuccess = useCallback(() => {
+    setIsBound(null) // 重置为未检查状态
+    loadInitialData()
+  }, [])
+
   // 加载状态
   if (loading) {
     return (
@@ -376,6 +392,15 @@ export function JustRightPage() {
     )
   }
 
+  // 未绑定状态 - 显示绑定界面
+  if (isBound === false) {
+    return (
+      <div className="h-full">
+        <CoupleBindView onBindSuccess={handleBindSuccess} />
+      </div>
+    )
+  }
+
   // 渲染当前视图
   const renderView = () => {
     switch (activeTab) {
@@ -385,8 +410,6 @@ export function JustRightPage() {
             data={homeData}
             myState={myState}
             partnerState={partnerState}
-            currentUserId={currentUserId}
-            partnerId={partnerId}
             onUpdateMood={handleUpdateMood}
             onUpdateFridgeNote={handleUpdateFridgeNote}
             onRaiseFlag={handleRaiseFlag}

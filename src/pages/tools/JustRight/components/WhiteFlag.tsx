@@ -1,7 +1,6 @@
 // 白旗求和按钮组件
 import { useState } from 'react'
-import { Flag, X } from 'lucide-react'
-import { cn } from '@/utils/cn'
+import { Flag } from 'lucide-react'
 
 interface WhiteFlagButtonProps {
   raised: boolean

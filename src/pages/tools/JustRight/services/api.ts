@@ -32,7 +32,7 @@ function withAppHeader(init?: RequestInit): RequestInit {
 // ============ 情侣关系 API ============
 export const coupleApi = {
   create: () =>
-    apiClient<Couple>(`${BASE}/couple`, withAppHeader({ method: 'POST' })),
+    apiClient<Couple>(`${BASE}/couples`, withAppHeader({ method: 'POST' })),
 
   join: (inviteCode: string) =>
     apiClient<Couple>(`${BASE}/couple/join?invite_code=${inviteCode}`, withAppHeader({ method: 'POST' })),

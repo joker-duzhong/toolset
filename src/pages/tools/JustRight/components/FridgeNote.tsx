@@ -1,6 +1,6 @@
 // 冰箱贴留言组件
 import { useState, useRef, useEffect } from 'react'
-import { Pin, Edit3 } from 'lucide-react'
+import { Edit3 } from 'lucide-react'
 import { cn } from '@/utils/cn'
 
 interface FridgeNoteProps {
