@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { AuthLoadingScreen } from '@/components/AuthLoadingScreen'
 import { ToolPage } from '@/components/ToolPage'
+import { ProtectedToolWrapper } from '@/components/ProtectedToolWrapper'
 import { HomePage } from '@/pages/HomePage'
 
 // 懒加载工具页面（处理 named exports）
@@ -208,13 +209,21 @@ export function AppRouter() {
         {/* ── 金融理财 ────────────────────── */}
         <Route
           path="/tools/trade-copilot"
-          element={<ToolWrapper><TradeCopilotPage /></ToolWrapper>}
+          element={
+            <ProtectedToolWrapper requiresAuth>
+              <ToolWrapper><TradeCopilotPage /></ToolWrapper>
+            </ProtectedToolWrapper>
+          }
         />
 
         {/* ── 情侣互动 ────────────────────── */}
         <Route
           path="/tools/justright"
-          element={<ToolWrapper fullscreen><JustRightPage /></ToolWrapper>}
+          element={
+            <ProtectedToolWrapper requiresAuth>
+              <ToolWrapper fullscreen><JustRightPage /></ToolWrapper>
+            </ProtectedToolWrapper>
+          }
         />
 
         {/* 兜底重定向 */}

@@ -1,6 +1,7 @@
 // 情侣绑定视图 - 邀请绑定流程
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { coupleApi } from '../services/api'
+import { InvitePoster } from '../components/InvitePoster'
 
 interface CoupleBindViewProps {
   onBindSuccess: () => void
@@ -13,6 +14,17 @@ export function CoupleBindView({ onBindSuccess }: CoupleBindViewProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [copySuccess, setCopySuccess] = useState(false)
+  const [showPoster, setShowPoster] = useState(false)
+
+  // 从 URL 参数中自动填充邀请码
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const codeFromUrl = params.get('invite_code')
+    if (codeFromUrl && mode === 'choose') {
+      setInputCode(codeFromUrl.toUpperCase())
+      setMode('join')
+    }
+  }, [])
 
   // 创建情侣关系
   const handleCreate = async () => {
@@ -20,9 +32,19 @@ export function CoupleBindView({ onBindSuccess }: CoupleBindViewProps) {
       setLoading(true)
       setError(null)
       const res = await coupleApi.create()
+
+      // 检查 code 是否为 2xx（成功）
+      if (!String(res.code).startsWith('2')) {
+        setError(res.message || '创建失败，请稍后重试')
+        return
+      }
+
+      // 获取邀请码
       if (res.data?.invite_code) {
         setInviteCode(res.data.invite_code)
         setMode('create')
+      } else {
+        setError('创建失败，未获取邀请码')
       }
     } catch (err) {
       console.error('Failed to create couple:', err)
@@ -52,7 +74,11 @@ export function CoupleBindView({ onBindSuccess }: CoupleBindViewProps) {
     try {
       setLoading(true)
       setError(null)
-      await coupleApi.join(inputCode.trim())
+      const res = await coupleApi.join(inputCode.trim())
+      if (!String(res.code).startsWith('2')) {
+        setError(res.message || '邀请码无效或已过期')
+        return
+      }
       // 绑定成功，刷新数据
       onBindSuccess()
     } catch (err) {
@@ -106,7 +132,7 @@ export function CoupleBindView({ onBindSuccess }: CoupleBindViewProps) {
             <div className="text-center mb-6">
               <div className="text-4xl mb-3">💌</div>
               <h2 className="text-lg font-semibold text-stone-800">你的专属邀请码</h2>
-              <p className="text-stone-500 text-sm mt-1">分享给 Ta，输入后即可绑定</p>
+              <p className="text-stone-500 text-sm mt-1">分享给 Ta，扫码或输入后即可绑定</p>
             </div>
 
             <div className="bg-gradient-to-r from-rose-50 to-amber-50 rounded-2xl p-4 mb-4">
@@ -117,16 +143,25 @@ export function CoupleBindView({ onBindSuccess }: CoupleBindViewProps) {
               </div>
             </div>
 
-            <button
-              onClick={handleCopyCode}
-              className={`w-full py-3 rounded-xl font-medium transition-all ${
-                copySuccess
-                  ? 'bg-green-100 text-green-600'
-                  : 'bg-rose-100 text-rose-600 hover:bg-rose-200'
-              }`}
-            >
-              {copySuccess ? '✓ 已复制' : '复制邀请码'}
-            </button>
+            <div className="space-y-3">
+              <button
+                onClick={() => setShowPoster(true)}
+                className="w-full py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white rounded-xl font-medium hover:shadow-lg shadow-rose-200 transition-all active:scale-[0.98]"
+              >
+                📱 生成邀请海报
+              </button>
+
+              <button
+                onClick={handleCopyCode}
+                className={`w-full py-3 rounded-xl font-medium transition-all ${
+                  copySuccess
+                    ? 'bg-green-100 text-green-600'
+                    : 'bg-rose-100 text-rose-600 hover:bg-rose-200'
+                }`}
+              >
+                {copySuccess ? '✓ 已复制' : '📋 复制邀请码'}
+              </button>
+            </div>
 
             <p className="text-center text-stone-400 text-xs mt-4">
               等待对方绑定中，绑定后自动进入
@@ -193,6 +228,9 @@ export function CoupleBindView({ onBindSuccess }: CoupleBindViewProps) {
           <p className="text-red-500 text-sm text-center mt-4">{error}</p>
         )}
       </div>
+
+      {/* 海报弹窗 - 在选择模式和加入模式时也可以显示 */}
+      {showPoster && <InvitePoster inviteCode={inviteCode} onClose={() => setShowPoster(false)} />}
     </div>
   )
 }

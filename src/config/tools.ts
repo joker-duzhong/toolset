@@ -283,6 +283,7 @@ export const TOOLS: ToolItem[] = [
     path: '/tools/trade-copilot',
     tags: ['A股', '交易', '持仓', '策略', '股票', '复盘'],
     isNew: true,
+    requiresAuth: true,
   },
 
   // ── 情侣互动 ──────────────────────────────────
@@ -296,6 +297,7 @@ export const TOOLS: ToolItem[] = [
     tags: ['情侣', '恋爱', '纪念日', '心愿单', '说明书'],
     isNew: true,
     isHot: true,
+    requiresAuth: true,
   },
 
 ]

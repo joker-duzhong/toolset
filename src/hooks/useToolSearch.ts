@@ -1,10 +1,12 @@
 import { useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
 import { TOOLS } from '@/config/tools'
 import type { ToolCategory } from '@/types/tool'
 
 export function useToolSearch() {
   const [searchParams, setSearchParams] = useSearchParams()
+  const { status } = useAuth()
 
   const query = searchParams.get('q') ?? ''
   const activeCategory = (searchParams.get('cat') ?? 'all') as ToolCategory | 'all'
@@ -46,6 +48,9 @@ export function useToolSearch() {
       // 过滤隐藏工具
       if (tool.hidden) return false
 
+      // 未认证时过滤需要认证的工具
+      if (tool.requiresAuth && status !== 'authenticated') return false
+
       // 过滤分类
       if (activeCategory !== 'all' && tool.category !== activeCategory) return false
 
@@ -63,7 +68,7 @@ export function useToolSearch() {
 
       return true
     })
-  }, [query, activeCategory])
+  }, [query, activeCategory, status])
 
 
   return {

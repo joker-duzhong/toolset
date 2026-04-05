@@ -16,7 +16,7 @@ export function useWatchlist() {
     setError(null)
     try {
       const res = await api.getWatchlist()
-      if (res.code === 200 && res.data) {
+      if (String(res.code).startsWith('2') && res.data) {
         setData(res.data)
       } else {
         setError(res.message || '获取观察池失败')
@@ -32,7 +32,7 @@ export function useWatchlist() {
 
   const add = useCallback(async (req: CreateWatchlistRequest) => {
     const res = await api.addToWatchlist(req)
-    if (res.code === 200) {
+    if (String(res.code).startsWith('2')) {
       await refresh()
       return { success: true }
     }
@@ -41,7 +41,7 @@ export function useWatchlist() {
 
   const update = useCallback(async (id: number, req: UpdateWatchlistRequest) => {
     const res = await api.updateWatchlist(id, req)
-    if (res.code === 200) {
+    if (String(res.code).startsWith('2')) {
       await refresh()
       return { success: true }
     }
@@ -50,7 +50,7 @@ export function useWatchlist() {
 
   const remove = useCallback(async (id: number) => {
     const res = await api.deleteWatchlist(id)
-    if (res.code === 200) {
+    if (String(res.code).startsWith('2')) {
       setData(prev => prev.filter(w => w.id !== id))
       return { success: true }
     }
@@ -68,7 +68,7 @@ export function useStList() {
   const refresh = useCallback(async () => {
     try {
       const res = await api.getStList()
-      if (res.code === 200 && res.data) {
+      if (String(res.code).startsWith('2') && res.data) {
         setStCodes(res.data.stocks)
         fetched.current = true
       }

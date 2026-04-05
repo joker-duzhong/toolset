@@ -16,7 +16,7 @@ export function useStrategies() {
     setError(null)
     try {
       const res = await api.getStrategies()
-      if (res.code === 200 && res.data) {
+      if (String(res.code).startsWith('2') && res.data) {
         setData(res.data)
       } else {
         setError(res.message || '获取策略失败')
@@ -32,7 +32,7 @@ export function useStrategies() {
 
   const create = useCallback(async (req: CreateStrategyRequest) => {
     const res = await api.createStrategy(req)
-    if (res.code === 200) {
+    if (String(res.code).startsWith('2')) {
       await refresh()
       return { success: true }
     }
@@ -41,7 +41,7 @@ export function useStrategies() {
 
   const update = useCallback(async (id: number, req: UpdateStrategyRequest) => {
     const res = await api.updateStrategy(id, req)
-    if (res.code === 200) {
+    if (String(res.code).startsWith('2')) {
       await refresh()
       return { success: true }
     }
@@ -50,7 +50,7 @@ export function useStrategies() {
 
   const deprecate = useCallback(async (id: number) => {
     const res = await api.deleteStrategy(id)
-    if (res.code === 200) {
+    if (String(res.code).startsWith('2')) {
       await refresh()
       return { success: true }
     }
@@ -70,7 +70,7 @@ export function useCapital() {
     setError(null)
     try {
       const res = await api.getCapital()
-      if (res.code === 200 && res.data) {
+      if (String(res.code).startsWith('2') && res.data) {
         setData(res.data)
       } else {
         setError(res.message || '获取资金设置失败')
@@ -86,7 +86,7 @@ export function useCapital() {
 
   const save = useCallback(async (totalCapital: number) => {
     const res = await api.updateCapital({ total_capital: totalCapital })
-    if (res.code === 200 && res.data) {
+    if (String(res.code).startsWith('2') && res.data) {
       setData(res.data)
       return { success: true }
     }

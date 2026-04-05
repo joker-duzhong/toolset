@@ -28,4 +28,5 @@ export interface ToolItem {
   isHot?: boolean      // 热门标记
   disabled?: boolean   // 即将上线
   hidden?: boolean     // 隐藏工具（不在首页展示，但可直接访问）
+  requiresAuth?: boolean // 是否需要登录访问此工具
 }

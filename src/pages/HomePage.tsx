@@ -1,19 +1,22 @@
-import { Wrench } from 'lucide-react'
-import { SearchBar } from '@/components/SearchBar'
-import { CategoryFilter } from '@/components/CategoryFilter'
-import { ToolCard } from '@/components/ToolCard'
-import { useToolSearch } from '@/hooks/useToolSearch'
+import { Wrench } from "lucide-react";
+import { SearchBar } from "@/components/SearchBar";
+import { CategoryFilter } from "@/components/CategoryFilter";
+import { ToolCard } from "@/components/ToolCard";
+import { useToolSearch } from "@/hooks/useToolSearch";
 
 export function HomePage() {
-  const { query, setQuery, activeCategory, setActiveCategory, filteredTools } = useToolSearch()
+  const { query, setQuery, activeCategory, setActiveCategory, filteredTools } = useToolSearch();
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ backgroundColor: "var(--color-bg-secondary)" }}
+    >
       {/* 顶部 Hero */}
       <div
         className="px-4 pt-12 pb-6 text-white"
         style={{
-          background: 'linear-gradient(135deg, #0d99ff 0%, #0b87e0 100%)',
+          background: "linear-gradient(135deg, #0d99ff 0%, #0b87e0 100%)",
         }}
       >
         <div className="flex items-center gap-2 mb-1">
@@ -38,11 +41,14 @@ export function HomePage() {
       <div
         className="px-4 py-3 sticky top-0 z-10 border-b"
         style={{
-          backgroundColor: 'var(--color-bg-base)',
-          borderColor: 'var(--color-border-light)'
+          backgroundColor: "var(--color-bg-base)",
+          borderColor: "var(--color-border-light)",
         }}
       >
-        <CategoryFilter active={activeCategory} onChange={setActiveCategory} />
+        <CategoryFilter
+          active={activeCategory}
+          onChange={setActiveCategory}
+        />
       </div>
 
       {/* 工具列表 */}
@@ -50,17 +56,17 @@ export function HomePage() {
         {filteredTools.length === 0 ? (
           <div
             className="flex flex-col items-center justify-center py-20"
-            style={{ color: 'var(--color-text-tertiary)' }}
+            style={{ color: "var(--color-text-tertiary)" }}
           >
             <span className="text-4xl mb-3">🔍</span>
             <p className="text-sm">没有找到相关工具</p>
             <button
               onClick={() => {
-                setQuery('')
-                setActiveCategory('all')
+                setQuery("");
+                setActiveCategory("all");
               }}
               className="mt-3 text-xs underline"
-              style={{ color: 'var(--color-primary)' }}
+              style={{ color: "var(--color-primary)" }}
             >
               清空筛选
             </button>
@@ -69,22 +75,26 @@ export function HomePage() {
           <>
             <p
               className="text-xs mb-3"
-              style={{ color: 'var(--color-text-tertiary)' }}
+              style={{ color: "var(--color-text-tertiary)" }}
             >
               共 {filteredTools.length} 个工具
               {query && <span>，搜索「{query}」</span>}
             </p>
             <div className="grid grid-cols-2 gap-3">
               {filteredTools.map((tool) => (
-                <ToolCard key={tool.id} tool={tool} />
+                <ToolCard
+                  key={tool.id}
+                  tool={tool}
+                />
               ))}
             </div>
           </>
         )}
       </main>
 
+      <div className="text-center">v1.0.0</div>
       {/* 底部留白（避免被手势条遮挡） */}
       <div className="h-6" />
     </div>
-  )
+  );
 }

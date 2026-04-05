@@ -16,7 +16,7 @@ export function useMarketStatus() {
     setError(null)
     try {
       const res = await api.getMarketStatus()
-      if (res.code === 200 && res.data) {
+      if (String(res.code).startsWith('2') && res.data) {
         setData(res.data)
       } else {
         setError(res.message || '获取大盘状态失败')
@@ -42,7 +42,7 @@ export function useMarketThermometer() {
     setError(null)
     try {
       const res = await api.getMarketThermometer()
-      if (res.code === 200 && res.data) {
+      if (String(res.code).startsWith('2') && res.data) {
         setData(res.data)
       } else {
         setError(res.message || '获取市场温度计失败')

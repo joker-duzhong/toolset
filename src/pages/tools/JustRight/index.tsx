@@ -90,10 +90,17 @@ export function JustRightPage() {
 
       // 先检查情侣绑定状态
       const coupleRes = await coupleApi.get()
+
+      if (!String(coupleRes.code).startsWith('2') || !coupleRes.data) {
+        setIsBound(false)
+        setLoading(false)
+        return
+      }
+
       const couple = coupleRes.data
 
       // 判断是否已绑定（status 为 active 且有 user2_id）
-      if (!couple || couple.status !== 'active' || !couple.user2_id) {
+      if (couple.status !== 'active' || !couple.user2_id) {
         setIsBound(false)
         setLoading(false)
         return
@@ -117,13 +124,7 @@ export function JustRightPage() {
       setWishlist(wishRes.data || [])
     } catch (err) {
       console.error('Failed to load data:', err)
-      // 如果是 404 或未绑定错误，显示绑定界面
-      const errMsg = String(err)
-      if (errMsg.includes('404') || errMsg.includes('not found')) {
-        setIsBound(false)
-      } else {
-        setError('加载数据失败，请稍后重试')
-      }
+      setError('加载数据失败，请稍后重试')
     } finally {
       setLoading(false)
     }

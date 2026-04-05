@@ -8,12 +8,16 @@ interface AuthContextValue {
   user: User | null
   status: AuthStatus
   logout: () => void
+  phoneLogin: (phone: string, code: string) => Promise<boolean>
+  sendPhoneCode: (phone: string) => Promise<{ success: boolean; countdown?: number; message?: string }>
 }
 
 const AuthContext = createContext<AuthContextValue>({
   user: null,
   status: 'checking',
   logout: () => {},
+  phoneLogin: async () => false,
+  sendPhoneCode: async () => ({ success: false }),
 })
 
 export function useAuth(): AuthContextValue {
@@ -32,7 +36,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const fetchUser = useCallback(async () => {
     try {
       const res = await apiClient<User>('/auth/me')
-      if (res.data) {
+      if (res.data && String(res.code).startsWith('2')) {
         setUser(res.data)
         setStatus('authenticated')
         return true
@@ -130,8 +134,54 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setStatus('unauthenticated')
   }, [])
 
+  const phoneLogin = useCallback(async (phone: string, code: string): Promise<boolean> => {
+    try {
+      const res = await fetch(`${API_BASE}/auth/phone/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, code }),
+      })
+      const json = await res.json()
+      if (json.data && String(json.code).startsWith('2')) {
+        setStoredTokens(json.data)
+        const ok = await fetchUser()
+        return ok
+      }
+      return false
+    } catch {
+      return false
+    }
+  }, [fetchUser])
+
+  const sendPhoneCode = useCallback(async (phone: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/auth/phone/send-code`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone }),
+      })
+      const json = await res.json()
+      if (json.data && String(json.code).startsWith('2')) {
+        return {
+          success: true,
+          countdown: json.data.countdown,
+          message: json.message,
+        }
+      }
+      return {
+        success: false,
+        message: json.message || '发送验证码失败',
+      }
+    } catch (err) {
+      return {
+        success: false,
+        message: '网络错误，请重试',
+      }
+    }
+  }, [])
+
   return (
-    <AuthContext.Provider value={{ user, status, logout }}>
+    <AuthContext.Provider value={{ user, status, logout, phoneLogin, sendPhoneCode }}>
       {children}
     </AuthContext.Provider>
   )

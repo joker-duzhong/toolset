@@ -16,7 +16,7 @@ export function usePositions(status?: string) {
     setError(null)
     try {
       const res = await api.getPositions(status)
-      if (res.code === 200 && res.data) {
+      if (String(res.code).startsWith('2') && res.data) {
         setData(res.data)
       } else {
         setError(res.message || '获取持仓失败')
@@ -32,7 +32,7 @@ export function usePositions(status?: string) {
 
   const createPosition = useCallback(async (req: CreatePositionRequest) => {
     const res = await api.createPosition(req)
-    if (res.code === 200) {
+    if (String(res.code).startsWith('2')) {
       await refresh()
       return { success: true }
     }
@@ -41,7 +41,7 @@ export function usePositions(status?: string) {
 
   const updatePosition = useCallback(async (id: number, req: UpdatePositionRequest) => {
     const res = await api.updatePosition(id, req)
-    if (res.code === 200) {
+    if (String(res.code).startsWith('2')) {
       await refresh()
       return { success: true }
     }
@@ -50,7 +50,7 @@ export function usePositions(status?: string) {
 
   const removePosition = useCallback(async (id: number) => {
     const res = await api.deletePosition(id)
-    if (res.code === 200) {
+    if (String(res.code).startsWith('2')) {
       setData(prev => prev.filter(p => p.id !== id))
       return { success: true }
     }
@@ -69,7 +69,7 @@ export function useTransactions(positionId: number | null) {
     setLoading(true)
     try {
       const res = await api.getTransactions(positionId)
-      if (res.code === 200 && res.data) {
+      if (String(res.code).startsWith('2') && res.data) {
         setData(res.data)
       }
     } catch {
@@ -84,7 +84,7 @@ export function useTransactions(positionId: number | null) {
   const createTransaction = useCallback(async (req: CreateTransactionRequest) => {
     if (!positionId) return { success: false, message: '无持仓 ID' }
     const res = await api.createTransaction(positionId, req)
-    if (res.code === 200) {
+    if (String(res.code).startsWith('2')) {
       await refresh()
       return { success: true }
     }

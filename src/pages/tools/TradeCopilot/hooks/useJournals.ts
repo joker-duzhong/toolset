@@ -16,7 +16,7 @@ export function useJournals() {
     setError(null)
     try {
       const res = await api.getJournals()
-      if (res.code === 200 && res.data) {
+      if (String(res.code).startsWith('2') && res.data) {
         setData(res.data)
       } else {
         setError(res.message || '获取日记失败')
@@ -32,7 +32,7 @@ export function useJournals() {
 
   const create = useCallback(async (req: CreateJournalRequest) => {
     const res = await api.createJournal(req)
-    if (res.code === 200) {
+    if (String(res.code).startsWith('2')) {
       await refresh()
       return { success: true }
     }
@@ -41,7 +41,7 @@ export function useJournals() {
 
   const update = useCallback(async (id: number, req: UpdateJournalRequest) => {
     const res = await api.updateJournal(id, req)
-    if (res.code === 200) {
+    if (String(res.code).startsWith('2')) {
       await refresh()
       return { success: true }
     }
