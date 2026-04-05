@@ -99,7 +99,7 @@ export const manualApi = {
 
   update: (data: Partial<UserManual>) =>
     apiClient<UserManual>(
-      `${BASE}/manual`,
+      `${BASE}/manuals`,
       withAppHeader({
         method: "PUT",
         body: JSON.stringify(data),
