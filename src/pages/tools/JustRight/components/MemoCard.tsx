@@ -19,7 +19,7 @@ export function MemoCard({ memo, onDelete }: MemoCardProps) {
 
   return (
     <div
-      className="bg-white rounded-2xl shadow-sm border border-stone-100 overflow-hidden"
+      className="bg-white rounded-3xl shadow-md shadow-stone-100/50 border border-stone-100 overflow-hidden group hover:shadow-xl hover:border-pink-200 transition-all duration-300"
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
@@ -27,39 +27,53 @@ export function MemoCard({ memo, onDelete }: MemoCardProps) {
       {memo.image_urls.length > 0 && (
         <div
           className={cn(
-            'grid gap-1 p-2',
+            'grid gap-1.5 p-3',
             memo.image_urls.length === 1 ? 'grid-cols-1' : 'grid-cols-2'
           )}
         >
           {memo.image_urls.slice(0, 4).map((url, index) => (
             <div
               key={index}
-              className="aspect-square bg-stone-100 rounded-lg overflow-hidden"
+              className="aspect-square bg-stone-100 rounded-xl overflow-hidden relative group/img"
             >
               <img
                 src={url}
                 alt=""
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-500"
                 loading="lazy"
               />
+              {showActions && (
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity duration-300">
+                  <button
+                    onClick={() => onDelete(memo.id)}
+                    className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-stone-400 hover:text-red-500 hover:scale-110 transition-all duration-300"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>
       )}
 
       {/* 内容区域 */}
-      <div className="p-3">
+      <div className="p-4">
         <p className="text-stone-700 text-sm whitespace-pre-wrap line-clamp-3">
           {memo.content}
         </p>
-        <div className="flex items-center justify-between mt-2 text-xs text-stone-400">
-          <span>{formatDate(memo.created_at)}</span>
+        <div className="flex items-center justify-between mt-3 pt-3 border-t border-stone-100">
+          <span className="text-xs font-medium text-stone-400 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 bg-pink-300 rounded-full" />
+            {formatDate(memo.created_at)}
+          </span>
           {showActions && (
             <button
               onClick={() => onDelete(memo.id)}
-              className="p-1 text-stone-300 hover:text-red-400 rounded-full hover:bg-red-50 transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all duration-300"
             >
               <Trash2 size={14} />
+              删除
             </button>
           )}
         </div>
@@ -114,53 +128,84 @@ export function MemoCreateModal({ open, onClose, onSubmit }: MemoCreateModalProp
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/30 backdrop-blur-sm">
-      <div className="w-full max-w-lg bg-white rounded-t-3xl p-6 animate-slide-up">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-md">
+      <div className="w-full max-w-lg bg-white rounded-t-4xl p-6 animate-slide-up shadow-2xl shadow-stone-200/50">
         {/* 头部 */}
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-medium text-stone-800">写备忘</h3>
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="text-xl font-bold text-stone-800 flex items-center gap-2">
+            <span className="text-2xl">✍️</span>
+            写备忘
+          </h3>
           <button
             onClick={onClose}
-            className="p-2 text-stone-400 hover:text-stone-600 rounded-full"
+            className="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 hover:bg-stone-200 hover:text-stone-600 transition-all duration-300"
           >
             <X size={20} />
           </button>
         </div>
 
-        {/* 内容输入 */}
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="记录点什么..."
-          className="w-full h-32 p-4 bg-stone-50 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-amber-200"
-        />
+        {/* 内容输入 - 精致设计 */}
+        <div className="relative">
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="记录点什么美好回忆..."
+            className="w-full h-36 p-5 bg-gradient-to-br from-stone-50 to-stone-100 rounded-2xl resize-none focus:outline-none focus:ring-4 focus:ring-pink-100/50 transition-all duration-300 text-stone-700 placeholder-stone-400 text-base"
+          />
+          <div className="absolute bottom-3 right-3 flex items-center gap-1">
+            <span className="text-xs text-stone-400">{content.length}/200</span>
+          </div>
+        </div>
 
         {/* 图片预览 */}
         {images.length > 0 && (
-          <div className="grid grid-cols-4 gap-2 mt-3">
+          <div className="grid grid-cols-4 gap-2 mt-4">
             {images.map((url, index) => (
-              <div key={index} className="relative aspect-square">
+              <div key={index} className="relative aspect-square group/img-preview">
                 <img
                   src={url}
                   alt=""
                   className="w-full h-full object-cover rounded-xl"
                 />
-                <button
-                  onClick={() => removeImage(index)}
-                  className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center"
-                >
-                  <X size={12} />
-                </button>
+                <div className="absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center opacity-0 group-hover/img-preview:opacity-100 transition-opacity duration-300">
+                  <button
+                    onClick={() => removeImage(index)}
+                    className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-stone-500 hover:text-red-500 transition-colors"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
               </div>
             ))}
+            {images.length < 4 && (
+              <button
+                disabled={uploading || images.length >= 4}
+                onClick={() => document.getElementById('memo-images')?.click()}
+                className="relative aspect-square rounded-xl border-2 border-dashed border-stone-200 bg-stone-50 flex items-center justify-center hover:border-pink-300 hover:bg-pink-50 transition-all duration-300 group/add"
+              >
+                <div className="text-center opacity-0 group-hover/add:opacity-100 transition-opacity duration-300">
+                  <ImagePlus size={24} className="mx-auto text-stone-400 group-hover/add:text-pink-400" />
+                  <span className="text-xs text-stone-400 group-hover/add:text-pink-400 mt-1 block">添加</span>
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleImageSelect}
+                  disabled={uploading || images.length >= 4}
+                  id="memo-images"
+                />
+              </button>
+            )}
           </div>
         )}
 
         {/* 底部操作 */}
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-stone-100">
-          <label className="flex items-center gap-2 px-4 py-2 text-stone-500 cursor-pointer hover:bg-stone-50 rounded-full">
-            <ImagePlus size={20} />
-            <span className="text-sm">添加图片</span>
+        <div className="flex items-center justify-between mt-6 pt-5 border-t border-stone-100">
+          <label className="flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-pink-50 to-rose-50 text-stone-500 cursor-pointer hover:from-pink-100 hover:to-rose-100 hover:text-pink-500 rounded-full transition-all duration-300 border border-pink-100 group">
+            <ImagePlus size={20} className="group-hover:scale-110 transition-transform" />
+            <span className="text-sm font-medium">添加图片</span>
             <input
               type="file"
               accept="image/*"
@@ -174,7 +219,7 @@ export function MemoCreateModal({ open, onClose, onSubmit }: MemoCreateModalProp
           <button
             onClick={handleSubmit}
             disabled={!content.trim() && images.length === 0}
-            className="px-6 py-2 bg-gradient-to-r from-amber-400 to-orange-400 text-white rounded-full font-medium shadow-md hover:shadow-lg disabled:opacity-50 disabled:shadow-none transition-all"
+            className="px-8 py-3 bg-gradient-to-r from-pink-400 to-rose-400 text-white rounded-full font-semibold shadow-lg shadow-pink-200/50 hover:shadow-xl hover:shadow-pink-300/50 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed"
           >
             发布
           </button>
@@ -186,7 +231,7 @@ export function MemoCreateModal({ open, onClose, onSubmit }: MemoCreateModalProp
             to { transform: translateY(0); }
           }
           .animate-slide-up {
-            animation: slide-up 0.3s ease-out;
+            animation: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);
           }
         `}</style>
       </div>

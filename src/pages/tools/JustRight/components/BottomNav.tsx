@@ -17,12 +17,12 @@ const navItems: { key: MainTab; label: string; icon: typeof Home }[] = [
 
 export function BottomNav({ active, onChange }: BottomNavProps) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50">
+    <nav className="fixed bottom-0 left-0 right-0 z-1">
       {/* 毛玻璃背景 */}
-      <div className="absolute inset-0 bg-white/80 backdrop-blur-xl border-t border-amber-100" />
+      <div className="absolute inset-0 bg-white/90 backdrop-blur-xl border-t border-amber-100/50" />
 
       {/* 导航项 */}
-      <div className="relative flex justify-around items-center h-16 max-w-lg mx-auto px-4">
+      <div className="relative flex justify-around items-center h-16 max-w-lg mx-auto px-6 pb-2">
         {navItems.map((item) => {
           const Icon = item.icon
           const isActive = active === item.key
@@ -32,27 +32,29 @@ export function BottomNav({ active, onChange }: BottomNavProps) {
               key={item.key}
               onClick={() => onChange(item.key)}
               className={cn(
-                'flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-300',
+                'flex flex-col items-center gap-1 py-2 transition-all duration-300',
                 isActive
-                  ? 'bg-gradient-to-r from-amber-100 to-orange-100 text-amber-600 scale-105'
+                  ? 'text-amber-600'
                   : 'text-stone-400 hover:text-stone-600'
               )}
             >
-              <Icon
-                size={22}
-                className={cn(
-                  'transition-transform duration-300',
-                  isActive && 'scale-110'
-                )}
-              />
-              <span className="text-xs font-medium">{item.label}</span>
+              <Icon size={20} className={cn(
+                'transition-transform duration-300',
+                isActive && 'scale-110'
+              )} />
+              <span className={cn(
+                'text-[10px] font-medium transition-colors',
+                isActive && 'text-amber-600'
+              )}>
+                {item.label}
+              </span>
             </button>
           )
         })}
       </div>
 
       {/* 安全区域 */}
-      <div className="h-[env(safe-area-inset-bottom)] bg-white/80" />
+      <div className="h-[env(safe-area-inset-bottom)] bg-white/90" />
     </nav>
   )
 }

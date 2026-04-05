@@ -109,18 +109,18 @@ export const manualApi = {
 
 // ============ 转盘 API ============
 export const rouletteApi = {
-  list: (category?: "food" | "place" | "other") => apiClient<RouletteOption[]>(`${BASE}/roulette${category ? `?category=${category}` : ""}`, withAppHeader()),
+  list: (category?: "food" | "place" | "other") => apiClient<RouletteOption[]>(`${BASE}/roulette/options${category ? `?category=${category}` : ""}`, withAppHeader()),
 
   add: (title: string, category: "food" | "place" | "other", weight = 1, color?: string) =>
     apiClient<RouletteOption>(
-      `${BASE}/roulette`,
+      `${BASE}/roulette/options`,
       withAppHeader({
         method: "POST",
         body: JSON.stringify({ title, category, weight, color }),
       }),
     ),
 
-  delete: (id: number) => apiClient<void>(`${BASE}/roulette/${id}`, withAppHeader({ method: "DELETE" })),
+  delete: (id: number) => apiClient<void>(`${BASE}/roulette/options/${id}`, withAppHeader({ method: "DELETE" })),
 };
 
 // ============ 心愿单 API ============

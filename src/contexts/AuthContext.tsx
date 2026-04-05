@@ -51,12 +51,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (initialized.current) return
     initialized.current = true
 
-    // 非微信浏览器直接跳过登录
-    if (!isWeChatBrowser()) {
-      setStatus('unauthenticated')
-      return
-    }
-
     const params = new URLSearchParams(window.location.search)
     const code = params.get('code')
 
@@ -66,7 +60,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (tokens) {
         const ok = await fetchUser()
         if (ok) return
-        // token 无效，继续走 code 或重新授权
+        // token 无效，继续处理
+      }
+
+      // 非微信浏览器跳过微信登录，直接允许使用
+      if (!isWeChatBrowser()) {
+        setStatus('unauthenticated')
+        return
       }
 
       // 处理微信回调的 code
@@ -94,7 +94,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         } catch {
           // code 换 token 失败
         }
-        // code 无效或已使用过，清理 URL 防止死循环，直接允许无登录使用
+        // code 无效或已使用过，清理 URL 防止死循环
         params.delete('code')
         params.delete('state')
         const cleanUrl = params.toString()
