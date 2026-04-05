@@ -305,7 +305,6 @@ export function WishlistAddModal({ open, onClose, onSubmit }: WishlistAddModalPr
 
 // ================= 浮动添加按钮 =================
 export function FloatingAddButton({ onClick }: { onClick: () => void }) {
-  // 注意：父组件 WishView 已经处理了 fixed bottom-24 等定位，这里只需要专注按钮本身的样式
   return (
     <motion.button
       whileHover={{ scale: 1.05 }}

@@ -237,11 +237,17 @@ export function JustRightPage() {
           couple_id: homeData.couple.id,
           creator_uid: currentUserId,
         })
-        if (res.data) {
-          setWishlist((prev) => [res.data!, ...prev])
+        // 检查 API 返回是否成功（code 以 '2' 开头表示成功）
+        if (res.code?.toString().startsWith('2') && res.data) {
+          console.log("Added Wish:", res.data);
+          setWishlist((prev) => [res.data!, ...(prev)])
           setHomeData((prev) => ({ ...prev, upcoming_wishes: prev.upcoming_wishes + 1 }))
+          console.log("Updated wishlist count:", res.data.id); // 打印新添加的心愿 ID 用于调试
+        } else {
+          console.error('Failed to add wish:', res.message || 'Unknown error', res);
         }
-      } catch (err) {
+        console.log("Current Wishlist Count:", wishlist.length);
+       } catch (err) {
         console.error('Failed to add wish:', err)
       }
     },

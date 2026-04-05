@@ -234,20 +234,10 @@ export function CategorySelector({ value, onChange }: CategorySelectorProps) {
         <button
           key={key}
           onClick={() => onChange(key)}
-          className={cn(
-            // 默认 flex-col (上下排列)，在 sm (大于640px) 屏幕上 flex-row (左右排列)
-            "flex-1 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2 sm:py-2.5 px-1 sm:px-4 rounded-xl transition-all",
-            value === key ? "bg-white text-stone-800 shadow-sm" : "text-stone-500 hover:text-stone-700"
-          )}
+          className={cn("flex-1 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-1 py-2.5 rounded-xl text-sm font-medium transition-all", value === key ? `bg-white text-stone-800 shadow-sm` : "text-stone-500 hover:text-stone-700")}
         >
-          {/* Emoji */}
-          <span className="text-base sm:text-sm leading-none">
-            {config.emoji}
-          </span>
-          {/* 文本：加上 whitespace-nowrap 保证绝对不换行，并适当减小手机端字号 */}
-          <span className="whitespace-nowrap text-xs sm:text-sm font-medium">
-            {config.label}
-          </span>
+          <span className="text-lg sm:text-base leading-none">{config.emoji}</span>
+          <span className="whitespace-nowrap text-[11px] sm:text-sm">{config.label}</span>
         </button>
       ))}
     </div>

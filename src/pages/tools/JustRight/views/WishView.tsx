@@ -277,6 +277,7 @@ function RouletteSection({ options, category, onCategoryChange, onAddOption, onD
         />
         <div className="mt-8 mb-4">
           <RouletteWheel
+            key={category}
             options={options}
             category={category}
           />
