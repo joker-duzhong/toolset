@@ -1,5 +1,7 @@
 // JustRight 类型定义 - 对齐后端 API
 
+import type { StorageInfo } from "@/common/api/storage"
+
 // ============ 通用类型 ============
 export interface User {
   uid: number
@@ -37,7 +39,7 @@ export interface Memo {
   couple_id: number
   creator_uid: number
   content: string
-  image_urls: string[]
+  resources: StorageInfo[]
   is_deleted: boolean
   created_at: string
   updated_at: string

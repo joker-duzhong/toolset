@@ -49,7 +49,7 @@ export async function apiClient<T>(input: string, init?: RequestInit): Promise<A
   if (tokens) {
     headers.set("Authorization", `Bearer ${tokens.accessToken}`);
   }
-  if (!headers.has("Content-Type") && init?.body) {
+  if (!headers.has("Content-Type") && init?.body && !(init.body instanceof FormData)) {
     headers.set("Content-Type", "application/json");
   }
 

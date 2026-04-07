@@ -71,27 +71,18 @@ export const todoApi = {
 export const memoApi = {
   list: (page = 1, pageSize = 20) => apiClient<PaginatedResponse<Memo>>(`${BASE}/memos?page=${page}&page_size=${pageSize}`, withAppHeader()),
 
-  create: (content: string, imageUrls: string[] = []) =>
+  create: (content: string, imageIds: string[] = []) =>
     apiClient<Memo>(
       `${BASE}/memos`,
       withAppHeader({
         method: "POST",
-        body: JSON.stringify({ content, image_urls: imageUrls }),
+        body: JSON.stringify({ content, image_urls: imageIds }),
       }),
     ),
 
   delete: (id: number) => apiClient<void>(`${BASE}/memos/${id}`, withAppHeader({ method: "DELETE" })),
 };
 
-// ============ 图片上传 API ============
-// TODO: 后期接入 OSS 后实现
-export const uploadApi = {
-  /** 暂未实现，后期接入 OSS */
-  image: async (_file: any): Promise<string> => {
-    // 预留接口，暂不实现
-    throw new Error("图片上传功能暂未开放");
-  },
-};
 
 // ============ 说明书 API ============
 export const manualApi = {

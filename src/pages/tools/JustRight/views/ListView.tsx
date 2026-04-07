@@ -12,7 +12,7 @@ interface ListViewProps {
   onAddTodo: (content: string) => void;
   onToggleTodo: (id: number, status: "pending" | "completed") => void;
   onDeleteTodo: (id: number) => void;
-  onAddMemo: (content: string, images: string[]) => void;
+  onAddMemo: (content: string, imageIds: string[]) => void;
   onDeleteMemo: (id: number) => void;
 }
 

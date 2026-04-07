@@ -1,21 +1,22 @@
 // 备忘录卡片组件
-import { useState } from 'react'
-import { ImagePlus, X, Trash2 } from 'lucide-react'
-import { cn } from '@/utils/cn'
-import type { Memo } from '../types'
+import { useState } from "react";
+import { ImagePlus, X, Trash2 } from "lucide-react";
+import { cn } from "@/utils/cn";
+import type { Memo } from "../types";
+import { storageApi } from "@/common/api/storage";
 
 interface MemoCardProps {
-  memo: Memo
-  onDelete: (id: number) => void
+  memo: Memo;
+  onDelete: (id: number) => void;
 }
 
 export function MemoCard({ memo, onDelete }: MemoCardProps) {
-  const [showActions, setShowActions] = useState(false)
+  const [showActions, setShowActions] = useState(false);
 
   const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr)
-    return `${date.getMonth() + 1}/${date.getDate()}`
-  }
+    const date = new Date(dateStr);
+    return `${date.getMonth() + 1}/${date.getDate()}`;
+  };
 
   return (
     <div
@@ -24,20 +25,15 @@ export function MemoCard({ memo, onDelete }: MemoCardProps) {
       onMouseLeave={() => setShowActions(false)}
     >
       {/* 图片区域 */}
-      {memo.image_urls.length > 0 && (
-        <div
-          className={cn(
-            'grid gap-1.5 p-3',
-            memo.image_urls.length === 1 ? 'grid-cols-1' : 'grid-cols-2'
-          )}
-        >
-          {memo.image_urls.slice(0, 4).map((url, index) => (
+      {memo.resources?.length > 0 && (
+        <div className={cn("grid gap-1.5 p-3", memo.resources.length === 1 ? "grid-cols-1" : "grid-cols-2")}>
+          {memo.resources.slice(0, 4).map((img, index) => (
             <div
               key={index}
               className="aspect-square bg-stone-100 rounded-xl overflow-hidden relative group/img"
             >
               <img
-                src={url}
+                src={img.thumb_url}
                 alt=""
                 className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-500"
                 loading="lazy"
@@ -59,9 +55,7 @@ export function MemoCard({ memo, onDelete }: MemoCardProps) {
 
       {/* 内容区域 */}
       <div className="p-4">
-        <p className="text-stone-700 text-sm whitespace-pre-wrap line-clamp-3">
-          {memo.content}
-        </p>
+        <p className="text-stone-700 text-sm whitespace-pre-wrap line-clamp-3">{memo.content}</p>
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-stone-100">
           <span className="text-xs font-medium text-stone-400 flex items-center gap-1">
             <span className="w-1.5 h-1.5 bg-pink-300 rounded-full" />
@@ -79,53 +73,70 @@ export function MemoCard({ memo, onDelete }: MemoCardProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // 备忘录创建弹窗
 interface MemoCreateModalProps {
-  open: boolean
-  onClose: () => void
-  onSubmit: (content: string, images: string[]) => void
+  open: boolean;
+  onClose: () => void;
+  onSubmit: (content: string, imageIds: string[]) => void;
+}
+
+interface ImageItem {
+  id: string;
+  previewUrl: string;
 }
 
 export function MemoCreateModal({ open, onClose, onSubmit }: MemoCreateModalProps) {
-  const [content, setContent] = useState('')
-  const [images, setImages] = useState<string[]>([])
-  const [uploading, setUploading] = useState(false)
+  const [content, setContent] = useState("");
+  const [images, setImages] = useState<ImageItem[]>([]);
+  const [uploading, setUploading] = useState(false);
 
   const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (!files) return
+    const files = e.target.files;
+    if (!files) return;
 
-    setUploading(true)
+    setUploading(true);
     try {
-      // 这里应该调用实际的图片上传 API
-      // const urls = await Promise.all([...files].map(f => uploadApi.image(f)))
-      // setImages([...images, ...urls])
+      const uploadPromises = [...files].map(async (file) => {
+        const res = await storageApi.upload(file);
+        if (res.data) {
+          return {
+            id: res.data.id,
+            previewUrl: res.data.url,
+          };
+        }
+        return null;
+      });
 
-      // 暂时使用本地预览
-      const newImages = [...files].map((file) => URL.createObjectURL(file))
-      setImages([...images, ...newImages].slice(0, 4))
+      const uploadedImages = await Promise.all(uploadPromises);
+      const validImages = uploadedImages.filter((img): img is ImageItem => img !== null);
+      setImages([...images, ...validImages].slice(0, 4));
+    } catch (err) {
+      console.error("Failed to upload images:", err);
     } finally {
-      setUploading(false)
+      setUploading(false);
     }
-  }
+  };
 
   const handleSubmit = () => {
     if (content.trim() || images.length > 0) {
-      onSubmit(content.trim(), images)
-      setContent('')
-      setImages([])
-      onClose()
+      onSubmit(
+        content.trim(),
+        images.map((img) => img.id),
+      );
+      setContent("");
+      setImages([]);
+      onClose();
     }
-  }
+  };
 
   const removeImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index))
-  }
+    setImages(images.filter((_, i) => i !== index));
+  };
 
-  if (!open) return null
+  if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-md">
@@ -160,10 +171,13 @@ export function MemoCreateModal({ open, onClose, onSubmit }: MemoCreateModalProp
         {/* 图片预览 */}
         {images.length > 0 && (
           <div className="grid grid-cols-4 gap-2 mt-4">
-            {images.map((url, index) => (
-              <div key={index} className="relative aspect-square group/img-preview">
+            {images.map((img, index) => (
+              <div
+                key={index}
+                className="relative aspect-square group/img-preview"
+              >
                 <img
-                  src={url}
+                  src={img.previewUrl}
                   alt=""
                   className="w-full h-full object-cover rounded-xl"
                 />
@@ -180,11 +194,14 @@ export function MemoCreateModal({ open, onClose, onSubmit }: MemoCreateModalProp
             {images.length < 4 && (
               <button
                 disabled={uploading || images.length >= 4}
-                onClick={() => document.getElementById('memo-images')?.click()}
+                onClick={() => document.getElementById("memo-images")?.click()}
                 className="relative aspect-square rounded-xl border-2 border-dashed border-stone-200 bg-stone-50 flex items-center justify-center hover:border-pink-300 hover:bg-pink-50 transition-all duration-300 group/add"
               >
                 <div className="text-center opacity-0 group-hover/add:opacity-100 transition-opacity duration-300">
-                  <ImagePlus size={24} className="mx-auto text-stone-400 group-hover/add:text-pink-400" />
+                  <ImagePlus
+                    size={24}
+                    className="mx-auto text-stone-400 group-hover/add:text-pink-400"
+                  />
                   <span className="text-xs text-stone-400 group-hover/add:text-pink-400 mt-1 block">添加</span>
                 </div>
                 <input
@@ -204,8 +221,11 @@ export function MemoCreateModal({ open, onClose, onSubmit }: MemoCreateModalProp
         {/* 底部操作 */}
         <div className="flex items-center justify-between mt-6 pt-5 border-t border-stone-100">
           <label className="flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-pink-50 to-rose-50 text-stone-500 cursor-pointer hover:from-pink-100 hover:to-rose-100 hover:text-pink-500 rounded-full transition-all duration-300 border border-pink-100 group">
-            <ImagePlus size={20} className="group-hover:scale-110 transition-transform" />
-            <span className="text-sm font-medium">添加图片</span>
+            <ImagePlus
+              size={20}
+              className="group-hover:scale-110 transition-transform"
+            />
+            <span className="text-sm font-medium">{uploading ? "上传中..." : "添加图片"}</span>
             <input
               type="file"
               accept="image/*"
@@ -236,14 +256,10 @@ export function MemoCreateModal({ open, onClose, onSubmit }: MemoCreateModalProp
         `}</style>
       </div>
     </div>
-  )
+  );
 }
 
 // 备忘录瀑布流容器
 export function MemoGrid({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="columns-2 gap-3 space-y-3">
-      {children}
-    </div>
-  )
+  return <div className="columns-2 gap-3 space-y-3">{children}</div>;
 }

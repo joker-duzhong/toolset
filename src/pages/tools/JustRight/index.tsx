@@ -169,9 +169,9 @@ export function JustRightPage() {
   }, [])
 
   // 备忘录操作
-  const handleAddMemo = useCallback(async (content: string, images: string[]) => {
+  const handleAddMemo = useCallback(async (content: string, imageIds: string[]) => {
     try {
-      const res = await memoApi.create(content, images)
+      const res = await memoApi.create(content, imageIds)
       if (res.data) {
         setMemos((prev) => [res.data!, ...prev])
       }
