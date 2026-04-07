@@ -50,7 +50,7 @@ const emptyHomeData: HomeData = {
   },
   manuals: {
     mine: { uid: 0, created_at: '', updated_at: '' },
-    partner: { uid: 0, created_at: '', updated_at: '' },
+    ta: { uid: 0, created_at: '', updated_at: '' },
   },
   pending_todos: 0,
   upcoming_wishes: 0,
@@ -119,7 +119,7 @@ export function JustRightPage() {
 
       setHomeData(homeRes.data || emptyHomeData)
       setTodos(todoRes.data || [])
-      setMemos(memoRes.data?.data || [])
+      setMemos(memoRes.data?.items || [])
       setRouletteOptions(rouletteRes.data || [])
       setWishlist(wishRes.data || [])
     } catch (err) {
@@ -346,18 +346,20 @@ export function JustRightPage() {
   const handleLowerFlag = useCallback(async () => {
     try {
       await coupleStateApi.lowerWhiteFlag()
-      setHomeData((prev) => ({
-        ...prev,
-        state: {
-          ...prev.state,
-          user1: { ...prev.state.user1, white_flag: { raised: false } },
-          user2: { ...prev.state.user2, white_flag: { raised: false } },
-        },
-      }))
+      setHomeData((prev) => {
+        const stateKey = isUser1 ? 'user1' : 'user2'
+        return {
+          ...prev,
+          state: {
+            ...prev.state,
+            [stateKey]: { ...prev.state[stateKey], white_flag: { raised: false } },
+          },
+        }
+      })
     } catch (err) {
       console.error('Failed to lower white flag:', err)
     }
-  }, [])
+  }, [isUser1])
 
   // 绑定成功后重新加载数据
   const handleBindSuccess = useCallback(() => {
@@ -435,7 +437,7 @@ export function JustRightPage() {
         return (
           <ManualView
             myManual={homeData.manuals.mine}
-            partnerManual={homeData.manuals.partner}
+            partnerManual={homeData.manuals.ta}
             onUpdate={handleUpdateManual}
           />
         )

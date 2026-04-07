@@ -73,6 +73,9 @@ const TradeCopilotPage = lazy(() =>
 const JustRightPage = lazy(() =>
   import('@/pages/tools/JustRight').then((m) => ({ default: m.JustRightPage }))
 )
+const NestTalkPage = lazy(() =>
+  import('@/pages/tools/NestTalk').then((m) => ({ default: m.NestTalkPage }))
+)
 
 // 页面加载占位
 function PageLoading() {
@@ -223,6 +226,15 @@ export function AppRouter() {
             <ProtectedToolWrapper requiresAuth>
               <ToolWrapper fullscreen><JustRightPage /></ToolWrapper>
             </ProtectedToolWrapper>
+          }
+        />
+
+        <Route
+          path="/tools/nesttalk"
+          element={
+            <ToolWrapper fullscreen>
+              <NestTalkPage />
+            </ToolWrapper>
           }
         />
 

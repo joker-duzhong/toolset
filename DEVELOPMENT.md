@@ -84,7 +84,7 @@ src/pages/tools/MyComplexTool/
 ├── types.ts            # 类型定义
 ├── constants.ts        # 常量配置（Tab 定义等）
 ├── services/
-│   └── api.ts          # API 服务（使用 apiClient + X-App header）
+│   └── api.ts          # API 服务（使用 apiClient + app header）
 ├── hooks/
 │   ├── useData.ts      # 数据获取 hook
 │   └── ...
@@ -233,7 +233,7 @@ import { apiClient } from '@/utils/apiClient'
 
 ### 5.2 工具 API 服务层模板
 
-**每个需要后端 API 的工具都必须有自己的服务层**，统一注入 `X-App` header：
+**每个需要后端 API 的工具都必须有自己的服务层**，统一注入 `app` header：
 
 ```typescript
 // src/pages/tools/MyTool/services/api.ts
@@ -243,10 +243,10 @@ import type { MyData, CreateMyDataRequest } from '../types'
 const BASE = '/my-tool'              // API 路径前缀
 const APP_KEY = 'hope_my_tool'       // 应用标识（后端用于区分不同工具）
 
-/** 统一注入 X-App header */
+/** 统一注入 app header */
 function withAppHeader(init?: RequestInit): RequestInit {
   const headers = new Headers(init?.headers)
-  headers.set('X-App', APP_KEY)
+  headers.set('app', APP_KEY)
   return { ...init, headers }
 }
 

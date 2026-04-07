@@ -1,10 +1,11 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { Heart, Calendar, MessageCircle, Sparkles, X, Flag } from "lucide-react";
 import { FridgeBoard, FridgeNote } from "../components/FridgeNote";
 import { MoodIndicator, MoodPicker } from "../components/MoodIndicator";
 import { WhiteFlagButton, WhiteFlagAnimation } from "../components/WhiteFlag";
 import type { HomeData, UserState } from "../types";
+import { coupleStateApi } from "../services/api";
 
 // 动画变体
 const containerVariants: Variants = {
@@ -36,7 +37,7 @@ interface HomeViewProps {
 
 export function HomeView({ data, myState, partnerState, onUpdateMood, onUpdateFridgeNote, onRaiseFlag, onLowerFlag }: HomeViewProps) {
   const [showMoodPicker, setShowMoodPicker] = useState(false);
-  const [now, setNow] = useState(() => Date.now());
+  const [_now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 10000);
@@ -46,12 +47,20 @@ export function HomeView({ data, myState, partnerState, onUpdateMood, onUpdateFr
   const { together_days, upcoming_anniversaries, state } = data;
   const nextAnniversary = upcoming_anniversaries[0];
 
-  const shouldShowWhiteFlag = useMemo(() => {
-    const flag = partnerState.white_flag;
-    if (!flag?.raised || !flag?.raised_at) return false;
-    const raisedTime = new Date(flag.raised_at).getTime();
-    return raisedTime > now - 60000;
-  }, [partnerState.white_flag, now]);
+  const [showWhiteFlagAnimation, setShowWhiteFlagAnimation] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    coupleStateApi.checkWhiteFlag().then((res) => {
+      if (mounted && res.data?.has_flag) {
+        setShowWhiteFlagAnimation(true);
+      }
+    }).catch(console.error);
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <motion.div
@@ -271,9 +280,9 @@ export function HomeView({ data, myState, partnerState, onUpdateMood, onUpdateFr
       </motion.div>
 
       {/* 全屏动画 */}
-      {shouldShowWhiteFlag && (
+      {showWhiteFlagAnimation && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/10 backdrop-blur-md">
-          <WhiteFlagAnimation onClose={onLowerFlag} />
+          <WhiteFlagAnimation onClose={() => setShowWhiteFlagAnimation(false)} />
         </div>
       )}
     </motion.div>

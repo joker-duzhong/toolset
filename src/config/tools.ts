@@ -300,4 +300,16 @@ export const TOOLS: ToolItem[] = [
     requiresAuth: true,
   },
 
+  {
+    id: 'nesttalk',
+    name: '语筑',
+    description: '房产 AI 助手，通过对话创建个性化买房监控任务，捕捉捡漏房源',
+    category: 'life',
+    icon: 'Home',
+    path: '/tools/nesttalk',
+    tags: ['房产', '二手房', '买房', '监控', '语筑'],
+    isNew: true,
+    requiresAuth: true,
+  },
+
 ]

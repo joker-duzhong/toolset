@@ -11,7 +11,9 @@
       "Bash(curl -s \"https://api.lxyy.fun/api/v1/auth/wechat/url?redirect_uri=https://example.com\")",
       "Bash(npm uninstall:*)",
       "Bash(ls e:/code/hope/toolset/dist/assets/*.css)",
-      "Bash(curl -o \"design.jpg\" \"https://maas-log-prod.cn-wlcb.ufileos.com/anthropic/f079fcbc-71f9-4047-b6f1-7d5389b4784a/fe55d624dc36e65c69489b10af500b68.jpg?UCloudPublicKey=TOKEN_e15ba47a-d098-4fbd-9afc-a0dcf0e4e621&Expires=1775403329&Signature=Zkep6STzohItjDEBqpU3K3Q2ne4=\")"
+      "Bash(curl -o \"design.jpg\" \"https://maas-log-prod.cn-wlcb.ufileos.com/anthropic/f079fcbc-71f9-4047-b6f1-7d5389b4784a/fe55d624dc36e65c69489b10af500b68.jpg?UCloudPublicKey=TOKEN_e15ba47a-d098-4fbd-9afc-a0dcf0e4e621&Expires=1775403329&Signature=Zkep6STzohItjDEBqpU3K3Q2ne4=\")",
+      "WebFetch(domain:api.lxyy.fun)",
+      "Bash(xargs grep:*)"
     ]
   }
 }

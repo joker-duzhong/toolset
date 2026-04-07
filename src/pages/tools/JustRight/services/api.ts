@@ -1,7 +1,7 @@
 // ────────────────────────────────────────────────
 // JustRight - API 服务层
 // ────────────────────────────────────────────────
-// 所有请求统一携带 app 标识符 (X-App header)
+// 所有请求统一携带 app 标识符 (app header)
 // ────────────────────────────────────────────────
 
 import { apiClient } from "@/utils/apiClient";
@@ -95,7 +95,7 @@ export const uploadApi = {
 
 // ============ 说明书 API ============
 export const manualApi = {
-  get: () => apiClient<{ mine: UserManual; partner: UserManual }>(`${BASE}/manual`, withAppHeader()),
+  get: () => apiClient<{ mine: UserManual; ta: UserManual }>(`${BASE}/manuals`, withAppHeader()),
 
   update: (data: Partial<UserManual>) =>
     apiClient<UserManual>(
@@ -136,9 +136,9 @@ export const wishlistApi = {
       }),
     ),
 
-  claim: (id: number) => apiClient<WishlistItem>(`${BASE}/wishlist/${id}/claim`, withAppHeader({ method: "PUT" })),
+  claim: (id: number) => apiClient<WishlistItem>(`${BASE}/wishlist/${id}/claim`, withAppHeader({ method: "POST" })),
 
-  fulfill: (id: number) => apiClient<WishlistItem>(`${BASE}/wishlist/${id}/fulfill`, withAppHeader({ method: "PUT" })),
+  fulfill: (id: number) => apiClient<WishlistItem>(`${BASE}/wishlist/${id}/fulfill`, withAppHeader({ method: "POST" })),
 
   delete: (id: number) => apiClient<void>(`${BASE}/wishlist/${id}`, withAppHeader({ method: "DELETE" })),
 };
@@ -190,7 +190,24 @@ export const coupleStateApi = {
       }),
     ),
 
-  raiseWhiteFlag: () => apiClient<void>(`${BASE}/state/white-flag/raise`, withAppHeader({ method: "POST" })),
+  raiseWhiteFlag: () =>
+    apiClient<UserState>(
+      `${BASE}/state`,
+      withAppHeader({
+        method: "PUT",
+        body: JSON.stringify({ white_flag: true }),
+      }),
+    ),
 
-  lowerWhiteFlag: () => apiClient<void>(`${BASE}/state/white-flag/lower`, withAppHeader({ method: "POST" })),
+  lowerWhiteFlag: () =>
+    apiClient<UserState>(
+      `${BASE}/state`,
+      withAppHeader({
+        method: "PUT",
+        body: JSON.stringify({ white_flag: false }),
+      }),
+    ),
+
+  checkWhiteFlag: () =>
+    apiClient<{ has_flag: boolean }>(`${BASE}/state/white-flag-check`, withAppHeader()),
 };

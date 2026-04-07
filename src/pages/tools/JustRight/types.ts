@@ -45,22 +45,22 @@ export interface Memo {
 
 // ============ 模块二：Ta的说明书 ============
 export interface DietPreferences {
-  allergies?: string[]
-  favorites?: string[]
-  dislikes?: string[]
-  restrictions?: string[]
+  allergies?: string | string[]
+  favorites?: string | string[]
+  dislikes?: string | string[]
+  restrictions?: string | string[]
 }
 
 export interface EmotionalGuide {
   when_sad?: string
   when_angry?: string
   when_stressed?: string
-  love_languages?: string[]
-  comfort_items?: string[]
+  love_languages?: string | string[]
+  comfort_items?: string | string[]
 }
 
 export interface ExtraInfo {
-  hobbies?: string[]
+  hobbies?: string | string[]
   birthday?: string
   zodiac?: string
   mbti?: string
@@ -161,7 +161,7 @@ export interface HomeData {
   state: CoupleState
   manuals: {
     mine: UserManual
-    partner: UserManual
+    ta: UserManual
   }
   pending_todos: number
   upcoming_wishes: number
@@ -174,7 +174,7 @@ export type ListSubTab = 'todo' | 'memo'
 
 // ============ API 响应类型 ============
 export interface PaginatedResponse<T> {
-  data: T[]
+  items: T[]
   total: number
   page: number
   page_size: number

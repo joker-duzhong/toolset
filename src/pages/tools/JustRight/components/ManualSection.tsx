@@ -75,48 +75,6 @@ function SizeSection({
   )
 }
 
-// 修复点 2 & 3: 将 TagGroup 提到外部并提供强类型，避免在 Render 中创建组件和使用 any
-interface TagGroupProps {
-  title: string
-  icon: string
-  items: string[]
-  category: keyof DietPreferences
-  activeColor: string
-  editing: boolean
-  isSelected: (category: keyof DietPreferences, item: string) => boolean
-  toggleItem: (category: keyof DietPreferences, item: string) => void
-}
-
-function TagGroup({ title, icon, items, category, activeColor, editing, isSelected, toggleItem }: TagGroupProps) {
-  return (
-    <div className="mb-4 last:mb-0">
-      <p className="text-xs text-stone-500 font-medium mb-2 flex items-center gap-1.5">
-        <span>{icon}</span> {title}
-      </p>
-      <div className="flex flex-wrap gap-2">
-        {items.map((item) => {
-          const selected = isSelected(category, item)
-          return (
-            <motion.button
-              whileTap={editing ? { scale: 0.95 } : {}}
-              key={item}
-              onClick={() => editing && toggleItem(category, item)}
-              disabled={!editing}
-              className={cn(
-                'px-3.5 py-1.5 text-xs font-medium rounded-full transition-all duration-300',
-                selected ? activeColor : 'bg-white text-stone-400 shadow-sm shadow-black/5',
-                editing ? 'hover:shadow-md cursor-pointer ring-1 ring-transparent hover:ring-stone-200' : 'cursor-default'
-              )}
-            >
-              {item}
-            </motion.button>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
 // --- 饮食偏好部分 ---
 function DietSection({
   manual = {} as UserManual,
@@ -129,20 +87,15 @@ function DietSection({
 }) {
   const diet = manual?.diet_preferences || {}
 
-  const commonFavorites = ['火锅', '烧烤', '日料', '西餐', '甜品', '奶茶']
-  const commonDislikes = ['不吃辣', '不吃香菜', '不吃葱蒜', '少吃油腻', '不吃内脏']
-  const commonAllergies = ['海鲜', '花生', '芒果', '牛奶', '鸡蛋']
-
-  const toggleItem = (category: keyof DietPreferences, item: string) => {
-    const currentList = diet[category] || []
-    const updatedList = currentList.includes(item)
-      ? currentList.filter((i) => i !== item)
-      : [...currentList, item]
-    onChange('diet_preferences', { ...diet, [category]: updatedList })
-  }
-
-  const isSelected = (category: keyof DietPreferences, item: string) => {
-    return diet[category]?.includes(item) ?? false
+  const fields = [
+    { key: 'favorites' as const, label: '喜欢的食物', emoji: '😋', placeholder: '火锅、烧烤、日料、甜品...' },
+    { key: 'dislikes' as const, label: '不吃 / 少吃', emoji: '🙅', placeholder: '不吃辣、少吃油腻、不吃香菜...' },
+    { key: 'allergies' as const, label: '过敏 / 忌口', emoji: '⚠️', placeholder: '海鲜、花生、牛奶...' },
+  ]
+  
+  const getVal = (key: keyof DietPreferences) => {
+    const val = diet[key]
+    return Array.isArray(val) ? val.join('，') : (val || '')
   }
 
   return (
@@ -151,24 +104,31 @@ function DietSection({
         <div className="p-1.5 bg-green-100 rounded-full text-green-600">
           <Utensils size={16} />
         </div>
-        <h4 className="font-semibold text-stone-700 tracking-wide">饮食偏好</h4>
+        <h4 className="font-semibold text-stone-700 tracking-wide">饮食爱好</h4>
       </div>
 
-      <TagGroup 
-        title="喜欢的食物" icon="😋" items={commonFavorites} category="favorites" 
-        activeColor="bg-orange-100 text-orange-700 ring-1 ring-orange-200"
-        editing={editing} isSelected={isSelected} toggleItem={toggleItem}
-      />
-      <TagGroup 
-        title="不吃 / 少吃" icon="🙅" items={commonDislikes} category="dislikes" 
-        activeColor="bg-stone-200 text-stone-700 ring-1 ring-stone-300"
-        editing={editing} isSelected={isSelected} toggleItem={toggleItem}
-      />
-      <TagGroup 
-        title="过敏 / 忌口" icon="⚠️" items={commonAllergies} category="allergies" 
-        activeColor="bg-rose-100 text-rose-700 ring-1 ring-rose-200"
-        editing={editing} isSelected={isSelected} toggleItem={toggleItem}
-      />
+      <div className="space-y-4">
+        {fields.map(({ key, label, emoji, placeholder }) => (
+          <div key={key}>
+            <p className="text-xs text-stone-500 font-medium mb-1.5 flex items-center gap-1.5">
+              <span>{emoji}</span> {label}
+            </p>
+            {editing ? (
+              <textarea
+                value={getVal(key)}
+                onChange={(e) => onChange('diet_preferences', { ...diet, [key]: e.target.value })}
+                placeholder={placeholder}
+                className="w-full px-4 py-3 text-sm bg-white rounded-2xl border-none ring-1 ring-green-100 focus:ring-2 focus:ring-green-300 outline-none resize-none transition-all shadow-sm shadow-green-900/5"
+                rows={2}
+              />
+            ) : (
+              <div className="text-sm text-stone-600 bg-white/70 rounded-2xl p-3.5 leading-relaxed shadow-sm shadow-green-900/5 border border-green-50/50">
+                {getVal(key) || <span className="text-stone-400 italic">等待解锁说明...</span>}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </motion.div>
   )
 }
