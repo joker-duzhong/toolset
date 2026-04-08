@@ -3,7 +3,7 @@ import { useState } from "react";
 import { ImagePlus, X, Trash2 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import type { Memo } from "../types";
-import { storageApi } from "@/common/api/storage";
+import { storageApi, type StorageInfo } from "@/common/api/storage";
 
 interface MemoCardProps {
   memo: Memo;
@@ -83,40 +83,30 @@ interface MemoCreateModalProps {
   onSubmit: (content: string, imageIds: string[]) => void;
 }
 
-interface ImageItem {
-  id: string;
-  previewUrl: string;
-}
-
 export function MemoCreateModal({ open, onClose, onSubmit }: MemoCreateModalProps) {
   const [content, setContent] = useState("");
-  const [images, setImages] = useState<ImageItem[]>([]);
+  const [images, setImages] = useState<StorageInfo[]>([]);
   const [uploading, setUploading] = useState(false);
 
   const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
+    const files = e.target?.files;
+    if (!files?.length) return;
 
     setUploading(true);
     try {
       const uploadPromises = [...files].map(async (file) => {
         const res = await storageApi.upload(file);
-        if (res.data) {
-          return {
-            id: res.data.id,
-            previewUrl: res.data.url,
-          };
-        }
-        return null;
+        return res.data || {} as StorageInfo;
       });
 
       const uploadedImages = await Promise.all(uploadPromises);
-      const validImages = uploadedImages.filter((img): img is ImageItem => img !== null);
+      const validImages = uploadedImages.filter((img): img is StorageInfo => img !== null);
       setImages([...images, ...validImages].slice(0, 4));
     } catch (err) {
       console.error("Failed to upload images:", err);
     } finally {
       setUploading(false);
+      e.target.value = "";
     }
   };
 
@@ -177,7 +167,7 @@ export function MemoCreateModal({ open, onClose, onSubmit }: MemoCreateModalProp
                 className="relative aspect-square group/img-preview"
               >
                 <img
-                  src={img.previewUrl}
+                  src={img.thumb_url}
                   alt=""
                   className="w-full h-full object-cover rounded-xl"
                 />
@@ -192,18 +182,21 @@ export function MemoCreateModal({ open, onClose, onSubmit }: MemoCreateModalProp
               </div>
             ))}
             {images.length < 4 && (
-              <button
-                disabled={uploading || images.length >= 4}
-                onClick={() => document.getElementById("memo-images")?.click()}
-                className="relative aspect-square rounded-xl border-2 border-dashed border-stone-200 bg-stone-50 flex items-center justify-center hover:border-pink-300 hover:bg-pink-50 transition-all duration-300 group/add"
-              >
-                <div className="text-center opacity-0 group-hover/add:opacity-100 transition-opacity duration-300">
-                  <ImagePlus
-                    size={24}
-                    className="mx-auto text-stone-400 group-hover/add:text-pink-400"
-                  />
-                  <span className="text-xs text-stone-400 group-hover/add:text-pink-400 mt-1 block">添加</span>
-                </div>
+              <>
+                <button
+                  disabled={uploading || images.length >= 4}
+                  onClick={() => document.getElementById("memo-images")?.click()}
+                  type="button"
+                  className="relative aspect-square rounded-xl border-2 border-dashed border-stone-200 bg-stone-50 flex items-center justify-center hover:border-pink-300 hover:bg-pink-50 transition-all duration-300 group/add"
+                >
+                  <div className="text-center opacity-0 group-hover/add:opacity-100 transition-opacity duration-300">
+                    <ImagePlus
+                      size={24}
+                      className="mx-auto text-stone-400 group-hover/add:text-pink-400"
+                    />
+                    <span className="text-xs text-stone-400 group-hover/add:text-pink-400 mt-1 block">添加</span>
+                  </div>
+                </button>
                 <input
                   type="file"
                   accept="image/*"
@@ -212,8 +205,9 @@ export function MemoCreateModal({ open, onClose, onSubmit }: MemoCreateModalProp
                   onChange={handleImageSelect}
                   disabled={uploading || images.length >= 4}
                   id="memo-images"
+                  onClick={(e) => { e.currentTarget.value = ""; }}
                 />
-              </button>
+              </>
             )}
           </div>
         )}
@@ -233,6 +227,7 @@ export function MemoCreateModal({ open, onClose, onSubmit }: MemoCreateModalProp
               className="hidden"
               onChange={handleImageSelect}
               disabled={uploading || images.length >= 4}
+              onClick={(e) => { e.currentTarget.value = ""; }}
             />
           </label>
 
