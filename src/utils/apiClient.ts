@@ -1,6 +1,7 @@
 import { getStoredTokens, setStoredTokens, clearStoredTokens } from "@/utils/storage";
+import toast from "react-hot-toast";
 
-export const API_BASE = false && import.meta.env.DEV ? "http://localhost:8000/api/v1" : "https://api.lxyy.fun/api/v1";
+export const API_BASE = import.meta.env.DEV ? "http://localhost:8000/api/v1" : "https://api.lxyy.fun/api/v1";
 
 export const WECHAT_APP_ID = import.meta.env.DEV ? "wxea6611dfdc3ecc4f" : "wx29ee8c1ad373bafa";
 
@@ -53,7 +54,7 @@ export async function apiClient<T>(input: string, init?: RequestInit): Promise<A
     headers.set("Content-Type", "application/json");
   }
 
-  const res = await fetch(`${API_BASE}${input}`, {
+  let res = await fetch(`${API_BASE}${input}`, {
     ...init,
     headers,
   });
@@ -68,15 +69,29 @@ export async function apiClient<T>(input: string, init?: RequestInit): Promise<A
         retryHeaders.set("Content-Type", "application/json");
       }
 
-      const retryRes = await fetch(`${API_BASE}${input}`, {
+      res = await fetch(`${API_BASE}${input}`, {
         ...init,
         headers: retryHeaders,
       });
-      return retryRes.json();
+    } else {
+      clearStoredTokens();
     }
-
-    clearStoredTokens();
   }
 
-  return res.json();
+  if (res.status === 429) {
+    toast.error("引力波干扰太强啦，稍作休息再试试吧！");
+    return { code: 429, message: "Too Many Requests", data: null as any };
+  }
+
+  if (res.status >= 500) {
+    toast.error("服务器正在承受高维打击，稍后再试吧！");
+    return { code: res.status, message: "Server Error", data: null as any };
+  }
+
+  const contentType = res.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    return res.json();
+  }
+
+  return { code: res.status, message: res.statusText, data: null as any };
 }

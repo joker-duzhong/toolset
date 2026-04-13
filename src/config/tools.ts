@@ -312,4 +312,16 @@ export const TOOLS: ToolItem[] = [
     requiresAuth: true,
   },
 
+  // ── 在问高考 ──────────────────────────────────
+  {
+    id: 'zaiwen-gaokao',
+    name: '在问高考',
+    description: '双面树洞、志愿逻辑红黑榜、限时战友屋，陪伴准大学生的 48 小时',
+    category: 'entertainment',
+    icon: 'GraduationCap',
+    path: '/tools/zaiwen-gaokao',
+    tags: ['高考', '树洞', '志愿', '战友', '社区'],
+    isNew: true,
+    requiresAuth: true,
+  },
 ]

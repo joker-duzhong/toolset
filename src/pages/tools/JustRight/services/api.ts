@@ -76,7 +76,7 @@ export const memoApi = {
       `${BASE}/memos`,
       withAppHeader({
         method: "POST",
-        body: JSON.stringify({ content, resource_ids: imageIds }),
+        body: JSON.stringify({ content, image_urls: imageIds }),
       }),
     ),
 

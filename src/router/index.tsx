@@ -76,6 +76,9 @@ const JustRightPage = lazy(() =>
 const NestTalkPage = lazy(() =>
   import('@/pages/tools/NestTalk').then((m) => ({ default: m.NestTalkPage }))
 )
+const ZaiwenGaokaoPage = lazy(() =>
+  import('@/pages/tools/zaiwen_gaokao').then((m) => ({ default: m.ZaiwenGaokaoPage }))
+)
 
 // 页面加载占位
 function PageLoading() {
@@ -235,6 +238,17 @@ export function AppRouter() {
             <ToolWrapper fullscreen>
               <NestTalkPage />
             </ToolWrapper>
+          }
+        />
+
+        <Route
+          path="/tools/zaiwen-gaokao"
+          element={
+            <ProtectedToolWrapper requiresAuth>
+              <ToolWrapper fullscreen>
+                <ZaiwenGaokaoPage />
+              </ToolWrapper>
+            </ProtectedToolWrapper>
           }
         />
 
