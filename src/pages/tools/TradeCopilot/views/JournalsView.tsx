@@ -4,11 +4,13 @@
 
 import { useState, useMemo } from 'react'
 import { Plus, BookOpen } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { useJournals } from '../hooks/useJournals'
 import { EmptyState } from '../components/EmptyState'
 import { StarRating } from '../components/StarRating'
 import { JournalCard } from '../components/JournalCard'
 import type { Journal, CreateJournalRequest, UpdateJournalRequest } from '../types'
+import { containerVariants, itemVariants } from '../utils/animations'
 
 // ── Form State ──────────────────────────────────
 
@@ -125,15 +127,21 @@ export function JournalsView() {
             description="记录你的第一篇交易日记"
           />
         ) : (
-          <div className="flex flex-col gap-3">
+          <motion.div
+            className="flex flex-col gap-3"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
             {sorted.map((journal) => (
-              <JournalCard
-                key={journal.id}
-                journal={journal}
-                onClick={openEdit}
-              />
+              <motion.div key={journal.id} variants={itemVariants}>
+                <JournalCard
+                  journal={journal}
+                  onClick={openEdit}
+                />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
 

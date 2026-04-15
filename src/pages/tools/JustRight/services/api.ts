@@ -55,7 +55,7 @@ export const todoApi = {
       }),
     ),
 
-  updateStatus: (id: number, status: "pending" | "completed") =>
+  updateStatus: (id: string, status: "pending" | "completed") =>
     apiClient<TodoItem>(
       `${BASE}/todos/${id}`,
       withAppHeader({
@@ -64,7 +64,7 @@ export const todoApi = {
       }),
     ),
 
-  delete: (id: number) => apiClient<void>(`${BASE}/todos/${id}`, withAppHeader({ method: "DELETE" })),
+  delete: (id: string) => apiClient<void>(`${BASE}/todos/${id}`, withAppHeader({ method: "DELETE" })),
 };
 
 // ============ 备忘录 API ============

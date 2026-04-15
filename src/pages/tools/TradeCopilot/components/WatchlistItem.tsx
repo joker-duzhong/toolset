@@ -3,6 +3,7 @@
 // ────────────────────────────────────────────────
 
 import { Pencil, Trash2, ShoppingCart } from 'lucide-react'
+import { motion } from 'framer-motion'
 import type { WatchlistItem as WatchlistItemType } from '../types'
 
 interface WatchlistItemProps {
@@ -16,7 +17,11 @@ export function WatchlistItem({ item, onEdit, onDelete, onQuickBuy }: WatchlistI
   const { name, symbol, reason, created_at } = item
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-4 transition active:scale-[0.98]">
+    <motion.div
+      className="bg-white/40 backdrop-blur-xl rounded-2xl border border-white/60 shadow-lg p-4 transition active:scale-[0.98]"
+      whileHover={{ y: -2 }}
+      whileTap={{ scale: 0.98 }}
+    >
       <div className="flex items-start justify-between gap-3">
         {/* Left: info */}
         <div className="min-w-0 flex-1">
@@ -59,6 +64,6 @@ export function WatchlistItem({ item, onEdit, onDelete, onQuickBuy }: WatchlistI
           </button>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

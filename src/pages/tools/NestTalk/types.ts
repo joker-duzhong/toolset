@@ -1,3 +1,9 @@
+export interface ChatMsg {
+  id: number
+  text: string
+  isBot: boolean
+}
+
 export interface Task {
   id: string
   title: string

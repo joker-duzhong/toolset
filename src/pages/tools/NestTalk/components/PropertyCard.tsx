@@ -6,31 +6,40 @@ export function PropertyCard({ property }: { property: Property }) {
   return (
     <motion.div
       whileTap={{ scale: 0.98 }}
-      className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-4 relative"
+      whileHover={{ y: -4 }}
+      className="bg-white/40 backdrop-blur-xl rounded-3xl border border-white/60 shadow-lg overflow-hidden relative hover:shadow-xl transition-shadow"
     >
-      <div className="absolute top-0 right-0 p-2 text-rose-500 font-bold text-xs bg-rose-50 rounded-bl-2xl px-3 border-l border-b border-rose-100 flex items-center gap-1">
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="absolute top-0 right-0 p-3 text-rose-600 font-bold text-xs bg-rose-500/20 backdrop-blur-sm rounded-bl-3xl px-4 border-l border-b border-rose-200/50 flex items-center gap-1.5"
+      >
         <BadgePercent size={14} /> 低于均价15%
-      </div>
-      <div className="p-4 pt-5">
-        <div className="font-semibold text-gray-800 text-lg mb-1">{property.name}</div>
-        <div className="text-sm text-gray-500 mb-3">{property.layout} / {property.area} / {property.location}</div>
-        
-        <div className="flex justify-between items-end border-b border-dashed border-gray-100 pb-3 mb-3">
-          <div className="text-xl font-bold text-rose-600">
-            {property.priceTotal} <span className="text-xs font-normal text-gray-400">万</span>
+      </motion.div>
+      <div className="p-6 pt-8">
+        <div className="font-bold text-gray-900 text-lg mb-2">{property.name}</div>
+        <div className="text-sm text-gray-600 mb-4">{property.layout} / {property.area} / {property.location}</div>
+
+        <div className="flex justify-between items-end border-b border-white/40 pb-4 mb-4">
+          <div className="text-2xl font-bold bg-linear-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
+            {property.priceTotal} <span className="text-xs font-normal text-gray-500">万</span>
           </div>
-          <div className="text-xs text-gray-400">{property.priceUnit} 元/平</div>
+          <div className="text-xs text-gray-600 font-medium">{property.priceUnit} 元/平</div>
         </div>
 
-        <div className="bg-slate-50 rounded-xl p-3 border border-slate-100 text-sm mt-3">
-           <div className="flex font-semibold text-slate-700 mb-2 gap-2 text-xs items-center">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-indigo-500/15 backdrop-blur-sm rounded-2xl p-4 border border-indigo-200/50 text-sm hover:bg-indigo-500/20 transition"
+        >
+           <div className="flex font-semibold text-indigo-900 mb-3 gap-2 text-xs items-center">
              <span>🤖 AI 深度分析</span>
-             <ChevronRight size={14} />
+             <ChevronRight size={14} className="text-indigo-600" />
            </div>
-           <div className="text-slate-600 text-xs leading-relaxed space-y-1">
+           <div className="text-indigo-800 text-xs leading-relaxed space-y-1">
              <p>{property.analysis}</p>
            </div>
-        </div>
+        </motion.div>
       </div>
     </motion.div>
   )

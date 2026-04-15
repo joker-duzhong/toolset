@@ -14,10 +14,12 @@ import {
   ShieldAlert,
   CheckCircle,
 } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { useStrategies, useCapital } from '../hooks/useStrategies'
 import { StrategyCard } from '../components/StrategyCard'
 import { EmptyState } from '../components/EmptyState'
 import type { Strategy, CreateStrategyRequest, UpdateStrategyRequest } from '../types'
+import { containerVariants, itemVariants } from '../utils/animations'
 
 // ── Main View ────────────────────────────────────
 
@@ -106,75 +108,95 @@ export function StrategiesView() {
         </button>
       </div>
 
-      {/* ── Capital Settings Card ──────────── */}
-      <section className="space-y-2">
-        <h2 className="text-sm font-semibold text-gray-500">资金设置</h2>
+      {/* Bento Grid Layout */}
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-max"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {/* Capital Settings Card - full width */}
+        <motion.section variants={itemVariants} className="space-y-2 lg:col-span-3">
+          <h2 className="text-sm font-semibold text-gray-500">资金设置</h2>
 
-        {capital.error ? (
-          <InlineError message={capital.error} onRetry={capital.refresh} />
-        ) : (
-          <button
-            onClick={() => setShowCapitalModal(true)}
-            className="w-full text-left rounded-2xl bg-white border border-gray-100 p-4 transition active:scale-[0.98]"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
-                <Wallet className="size-5 text-indigo-500" />
+          {capital.error ? (
+            <InlineError message={capital.error} onRetry={capital.refresh} />
+          ) : (
+            <motion.button
+              onClick={() => setShowCapitalModal(true)}
+              className="w-full text-left rounded-2xl bg-white/40 backdrop-blur-xl border border-white/60 shadow-lg p-4 transition active:scale-[0.98]"
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
+                  <Wallet className="size-5 text-indigo-500" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-500">总资金</p>
+                  <p className="text-xl font-bold text-gray-800">
+                    <span className="text-xs font-normal text-gray-400 mr-0.5">&yen;</span>
+                    {capital.loading
+                      ? '--'
+                      : capital.data?.total_capital.toLocaleString('zh-CN', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }) ?? '--'}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-gray-500">佣金率</p>
+                  <p className="text-lg font-bold text-gray-600">
+                    {capital.loading
+                      ? '--'
+                      : capital.data
+                        ? `${(capital.data.commission_rate * 100).toFixed(3)}%`
+                        : '--'}
+                  </p>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-500">总资金</p>
-                <p className="text-xl font-bold text-gray-800">
-                  <span className="text-xs font-normal text-gray-400 mr-0.5">&yen;</span>
-                  {capital.loading
-                    ? '--'
-                    : capital.data?.total_capital.toLocaleString('zh-CN', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }) ?? '--'}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-500">佣金率</p>
-                <p className="text-lg font-bold text-gray-600">
-                  {capital.loading
-                    ? '--'
-                    : capital.data
-                      ? `${(capital.data.commission_rate * 100).toFixed(3)}%`
-                      : '--'}
-                </p>
-              </div>
-            </div>
-          </button>
+            </motion.button>
+          )}
+        </motion.section>
+
+        {/* Strategy Cards */}
+        {!strategies.error && !strategies.loading && strategies.data.length > 0 && (
+          <>
+            {strategies.data.map((s) => (
+              <motion.div key={s.id} variants={itemVariants}>
+                <StrategyCard
+                  strategy={s}
+                  onEdit={setEditingStrategy}
+                  onDeprecate={(id) => setDeprecatingId(id)}
+                />
+              </motion.div>
+            ))}
+          </>
         )}
-      </section>
+      </motion.div>
 
-      {/* ── Strategy List ─────────────────── */}
-      <section className="space-y-2">
-        <h2 className="text-sm font-semibold text-gray-500">我的策略</h2>
-
-        {strategies.error ? (
+      {/* Error/Loading/Empty States */}
+      {strategies.error && (
+        <div className="mt-4">
           <InlineError message={strategies.error} onRetry={strategies.refresh} />
-        ) : strategies.loading ? (
+        </div>
+      )}
+
+      {strategies.loading && (
+        <div className="mt-4">
           <StrategyListSkeleton />
-        ) : strategies.data.length === 0 ? (
+        </div>
+      )}
+
+      {!strategies.loading && !strategies.error && strategies.data.length === 0 && (
+        <div className="mt-4">
           <EmptyState
             icon={Target}
             title="暂无策略"
             description="点击右下角按钮创建你的第一个交易策略"
           />
-        ) : (
-          <div className="flex flex-col gap-3">
-            {strategies.data.map((s) => (
-              <StrategyCard
-                key={s.id}
-                strategy={s}
-                onEdit={setEditingStrategy}
-                onDeprecate={(id) => setDeprecatingId(id)}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+        </div>
+      )}
 
       {/* FAB */}
       <button

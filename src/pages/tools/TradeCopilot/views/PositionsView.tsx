@@ -4,11 +4,13 @@
 
 import { useState } from 'react'
 import { Plus, X, Loader2 } from 'lucide-react'
+import { motion } from 'framer-motion'
 import type { PositionStatus, CreatePositionRequest } from '../types'
 import { usePositions } from '../hooks/usePositions'
 import { PositionCard } from '../components/PositionCard'
 import { EmptyState } from '../components/EmptyState'
 import { PositionDetailView } from './PositionDetailView'
+import { containerVariants, itemVariants } from '../utils/animations'
 
 // ── Tabs config ──────────────────────────────────
 const TABS: { key: PositionStatus; label: string }[] = [
@@ -297,15 +299,21 @@ export function PositionsView() {
         )}
 
         {!loading && data.length > 0 && (
-          <div className="p-4 space-y-3">
+          <motion.div
+            className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-max"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
             {data.map((pos) => (
-              <PositionCard
-                key={pos.id}
-                position={pos}
-                onClick={setSelectedPositionId}
-              />
+              <motion.div key={pos.id} variants={itemVariants}>
+                <PositionCard
+                  position={pos}
+                  onClick={setSelectedPositionId}
+                />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
 

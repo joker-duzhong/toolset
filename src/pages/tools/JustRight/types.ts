@@ -22,7 +22,7 @@ export interface Couple {
 
 // ============ 模块一：清单与备忘 ============
 export interface TodoItem {
-  id: number
+  id: string
   couple_id: number
   creator_uid: number
   content: string

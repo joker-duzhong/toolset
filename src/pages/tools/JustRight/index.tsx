@@ -143,7 +143,7 @@ export function JustRightPage() {
     }
   }, [])
 
-  const handleToggleTodo = useCallback(async (id: number, status: 'pending' | 'completed') => {
+  const handleToggleTodo = useCallback(async (id: string, status: 'pending' | 'completed') => {
     try {
       const res = await todoApi.updateStatus(id, status)
       if (res.data) {
@@ -159,7 +159,7 @@ export function JustRightPage() {
     }
   }, [])
 
-  const handleDeleteTodo = useCallback(async (id: number) => {
+  const handleDeleteTodo = useCallback(async (id: string) => {
     try {
       await todoApi.delete(id)
       setTodos((prev) => prev.filter((t) => t.id !== id))

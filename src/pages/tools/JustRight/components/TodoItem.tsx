@@ -7,8 +7,8 @@ import type { TodoItem } from '../types'
 // --- TodoItemCard: 每一行任务 ---
 interface TodoItemProps {
   item: TodoItem
-  onToggle: (id: number, status: 'pending' | 'completed') => void
-  onDelete: (id: number) => void
+  onToggle: (id: string, status: 'pending' | 'completed') => void
+  onDelete: (id: string) => void
   showConfetti?: () => void
 }
 

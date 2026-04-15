@@ -4,6 +4,7 @@
 
 import { useState, useCallback } from 'react'
 import { Plus, Eye, X } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { useWatchlist, useStList } from '../hooks/useWatchlist'
 import { WatchlistItem } from '../components/WatchlistItem'
 import { EmptyState } from '../components/EmptyState'
@@ -12,6 +13,7 @@ import type {
   CreateWatchlistRequest,
   UpdateWatchlistRequest,
 } from '../types'
+import { containerVariants, itemVariants } from '../utils/animations'
 
 // ── Modal 模式 ────────────────────────────────
 type ModalMode = 'add' | 'edit'
@@ -161,19 +163,25 @@ export function WatchlistView() {
 
       {/* List */}
       {!loading && !error && data.length > 0 && (
-        <div className="space-y-3 px-4 py-4">
+        <motion.div
+          className="space-y-3 px-4 py-4"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
           {data.map(item => (
-            <WatchlistItem
-              key={item.id}
-              item={item}
-              onEdit={openEditModal}
-              onDelete={id => setDeleteTarget(id)}
-              onQuickBuy={item => {
-                console.info('quick buy', item.symbol)
-              }}
-            />
+            <motion.div key={item.id} variants={itemVariants}>
+              <WatchlistItem
+                item={item}
+                onEdit={openEditModal}
+                onDelete={id => setDeleteTarget(id)}
+                onQuickBuy={item => {
+                  console.info('quick buy', item.symbol)
+                }}
+              />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
 
       {/* FAB */}

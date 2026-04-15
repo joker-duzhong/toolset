@@ -3,6 +3,7 @@
 // ────────────────────────────────────────────────
 
 import { Pencil, Archive } from 'lucide-react'
+import { motion } from 'framer-motion'
 import type { Strategy } from '../types'
 
 interface StrategyCardProps {
@@ -15,10 +16,12 @@ export function StrategyCard({ strategy, onEdit, onDeprecate }: StrategyCardProp
   const { id, name, take_profit_drawdown_pct, stop_loss_pct, description, is_deleted } = strategy
 
   return (
-    <div
-      className={`bg-white rounded-xl shadow-sm p-4 transition active:scale-[0.98] ${
+    <motion.div
+      className={`bg-white/40 backdrop-blur-xl rounded-2xl border border-white/60 shadow-lg p-4 transition active:scale-[0.98] ${
         is_deleted ? 'opacity-50 grayscale' : ''
       }`}
+      whileHover={{ y: -2 }}
+      whileTap={{ scale: 0.98 }}
     >
       {/* Header: name + status tag */}
       <div className="flex items-start justify-between gap-2 mb-3">
@@ -78,6 +81,6 @@ export function StrategyCard({ strategy, onEdit, onDeprecate }: StrategyCardProp
           </button>
         )}
       </div>
-    </div>
+    </motion.div>
   )
 }

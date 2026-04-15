@@ -12,7 +12,7 @@ interface BottomNavProps {
 export function BottomNav({ active, onChange }: BottomNavProps) {
   return (
     <nav
-      className="sticky bottom-0 z-20 bg-white/95 backdrop-blur border-t border-gray-100 flex items-center justify-around px-1 py-1.5"
+      className="sticky bottom-0 z-20 bg-white/80 backdrop-blur-xl border-t border-white/20 flex items-center justify-around px-1 py-1.5"
       style={{ paddingBottom: 'max(0.375rem, env(safe-area-inset-bottom))' }}
     >
       {TABS.map(({ key, label, icon: Icon }) => (

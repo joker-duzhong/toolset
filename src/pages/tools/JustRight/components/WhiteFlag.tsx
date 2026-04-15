@@ -24,7 +24,7 @@ export function WhiteFlagButton({ raised, onRaise, onLower }: WhiteFlagButtonPro
   }
 
   return (
-    <div className="relative">
+    <div className="relative z-20">
       <button
         onClick={() => setShowConfirm(true)}
         className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-stone-100 to-stone-200 rounded-full shadow-md text-stone-600 hover:from-stone-200 hover:to-stone-300 transition-all"
@@ -35,7 +35,11 @@ export function WhiteFlagButton({ raised, onRaise, onLower }: WhiteFlagButtonPro
 
       {/* 确认弹窗 */}
       {showConfirm && (
-        <div className="absolute bottom-full mb-2 right-0 bg-white rounded-2xl p-4 shadow-lg border border-stone-100 w-48 z-10">
+        <div className="fixed bottom-auto right-auto bg-white rounded-2xl p-4 shadow-lg border border-stone-100 w-48 z-50" style={{
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)'
+        }}>
           <p className="text-sm text-stone-600 mb-3 text-center">
             🏳️ 确认举白旗求和？
           </p>

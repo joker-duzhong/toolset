@@ -10,8 +10,8 @@ interface ListViewProps {
   todos: TodoItem[];
   memos: Memo[];
   onAddTodo: (content: string) => void;
-  onToggleTodo: (id: number, status: "pending" | "completed") => void;
-  onDeleteTodo: (id: number) => void;
+  onToggleTodo: (id: string, status: "pending" | "completed") => void;
+  onDeleteTodo: (id: string) => void;
   onAddMemo: (content: string, imageIds: string[]) => void;
   onDeleteMemo: (id: number) => void;
 }
@@ -20,8 +20,8 @@ interface TodoSectionProps {
   pendingTodos: TodoItem[];
   completedTodos: TodoItem[];
   onAdd: (content: string) => void;
-  onToggle: (id: number, status: "pending" | "completed") => void;
-  onDelete: (id: number) => void;
+  onToggle: (id: string, status: "pending" | "completed") => void;
+  onDelete: (id: string) => void;
 }
 
 interface MemoSectionProps {

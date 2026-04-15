@@ -3,6 +3,7 @@
 // ────────────────────────────────────────────────
 
 import { Star } from 'lucide-react'
+import { motion } from 'framer-motion'
 import type { Journal } from '../types'
 
 interface JournalCardProps {
@@ -19,9 +20,11 @@ export function JournalCard({ journal, onClick }: JournalCardProps) {
       : notes ?? ''
 
   return (
-    <button
+    <motion.button
       onClick={() => onClick(journal)}
-      className="w-full text-left bg-amber-50/50 rounded-xl shadow-sm p-4 transition active:scale-[0.98]"
+      className="w-full text-left bg-amber-500/10 backdrop-blur-xl rounded-2xl border border-amber-200/50 shadow-lg p-4 transition active:scale-[0.98]"
+      whileHover={{ y: -2 }}
+      whileTap={{ scale: 0.98 }}
     >
       {/* Header: date + execution score */}
       <div className="flex items-center justify-between gap-2 mb-2">
@@ -41,6 +44,6 @@ export function JournalCard({ journal, onClick }: JournalCardProps) {
           {truncated}
         </p>
       )}
-    </button>
+    </motion.button>
   )
 }
