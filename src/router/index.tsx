@@ -79,6 +79,9 @@ const NestTalkPage = lazy(() =>
 const ZaiwenGaokaoPage = lazy(() =>
   import('@/pages/tools/zaiwen_gaokao').then((m) => ({ default: m.ZaiwenGaokaoPage }))
 )
+const ProjectSisyphusPage = lazy(() =>
+  import('@/pages/tools/ProjectSisyphus').then((m) => ({ default: m.ProjectSisyphusPage }))
+)
 
 // 页面加载占位
 function PageLoading() {
@@ -247,6 +250,18 @@ export function AppRouter() {
             <ProtectedToolWrapper requiresAuth>
               <ToolWrapper fullscreen>
                 <ZaiwenGaokaoPage />
+              </ToolWrapper>
+            </ProtectedToolWrapper>
+          }
+        />
+
+        {/* ── 西西弗斯认知引擎 ────────────────── */}
+        <Route
+          path="/tools/project-sisyphus"
+          element={
+            <ProtectedToolWrapper requiresAuth>
+              <ToolWrapper fullscreen>
+                <ProjectSisyphusPage />
               </ToolWrapper>
             </ProtectedToolWrapper>
           }

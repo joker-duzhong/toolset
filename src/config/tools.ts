@@ -312,6 +312,19 @@ export const TOOLS: ToolItem[] = [
     requiresAuth: true,
   },
 
+  // ── 西西弗斯认知引擎 ──────────────────────────
+  {
+    id: 'project-sisyphus',
+    name: '西西弗斯',
+    description: '基于"合意困难"的生成式学习引擎，通过动态脚手架逼迫大脑提取练习',
+    category: 'other',
+    icon: 'Brain',
+    path: '/tools/project-sisyphus',
+    tags: ['学习', '英语', '认知', '提取练习', 'AI导师'],
+    isNew: true,
+    requiresAuth: true,
+  },
+
   // ── 在问高考 ──────────────────────────────────
   {
     id: 'zaiwen-gaokao',
