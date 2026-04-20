@@ -10,6 +10,7 @@ interface AuthContextValue {
   logout: () => void
   phoneLogin: (phone: string, code: string) => Promise<boolean>
   sendPhoneCode: (phone: string) => Promise<{ success: boolean; countdown?: number; message?: string }>
+  passwordLogin: (username: string, password: string) => Promise<{ success: boolean; message?: string }>
 }
 
 const AuthContext = createContext<AuthContextValue>({
@@ -18,6 +19,7 @@ const AuthContext = createContext<AuthContextValue>({
   logout: () => {},
   phoneLogin: async () => false,
   sendPhoneCode: async () => ({ success: false }),
+  passwordLogin: async () => ({ success: false }),
 })
 
 export function useAuth(): AuthContextValue {
@@ -180,8 +182,36 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, [])
 
+  const passwordLogin = useCallback(async (username: string, password: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      })
+      const json = await res.json()
+      if (json.data && String(json.code).startsWith('2')) {
+        setStoredTokens(json.data)
+        const ok = await fetchUser()
+        return {
+          success: ok,
+          message: ok ? undefined : '获取用户信息失败',
+        }
+      }
+      return {
+        success: false,
+        message: json.message || '登录失败',
+      }
+    } catch (err) {
+      return {
+        success: false,
+        message: '网络错误，请重试',
+      }
+    }
+  }, [fetchUser])
+
   return (
-    <AuthContext.Provider value={{ user, status, logout, phoneLogin, sendPhoneCode }}>
+    <AuthContext.Provider value={{ user, status, logout, phoneLogin, sendPhoneCode, passwordLogin }}>
       {children}
     </AuthContext.Provider>
   )

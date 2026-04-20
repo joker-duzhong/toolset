@@ -80,12 +80,12 @@ export async function apiClient<T>(input: string, init?: RequestInit): Promise<A
 
   if (res.status === 429) {
     toast.error("引力波干扰太强啦，稍作休息再试试吧！");
-    return { code: 429, message: "Too Many Requests", data: null as any };
+    return { code: 429, message: "Too Many Requests", data: null };
   }
 
   if (res.status >= 500) {
     toast.error("服务器正在承受高维打击，稍后再试吧！");
-    return { code: res.status, message: "Server Error", data: null as any };
+    return { code: res.status, message: "Server Error", data: null };
   }
 
   const contentType = res.headers.get("content-type");
@@ -93,5 +93,5 @@ export async function apiClient<T>(input: string, init?: RequestInit): Promise<A
     return res.json();
   }
 
-  return { code: res.status, message: res.statusText, data: null as any };
+  return { code: res.status, message: res.statusText, data: null };
 }

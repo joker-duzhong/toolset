@@ -7,6 +7,7 @@ export type ToolCategory =
   | 'dev'      // 开发工具
   | 'entertainment' // 影音娱乐
   | 'finance'      // 金融理财
+  | 'ai'       // AI/创意产品
   | 'other'    // 其他
 
 export interface ToolCategoryInfo {

@@ -3,6 +3,7 @@ import { X } from 'lucide-react'
 import { isWeChatBrowser } from '@/utils/wechat'
 import { WECHAT_APP_ID } from '@/utils/apiClient'
 import { PhoneLoginForm } from './PhoneLoginForm'
+import { PasswordLoginForm } from './PasswordLoginForm'
 
 interface AuthModalProps {
   onClose: () => void
@@ -10,7 +11,7 @@ interface AuthModalProps {
 }
 
 export function AuthModal({ onClose, onSuccess }: AuthModalProps) {
-  const [loginMethod, setLoginMethod] = useState<'wechat' | 'phone' | null>(null)
+  const [loginMethod, setLoginMethod] = useState<'wechat' | 'phone' | 'password' | null>(null)
   const isWechat = isWeChatBrowser()
 
   useEffect(() => {
@@ -99,6 +100,18 @@ export function AuthModal({ onClose, onSuccess }: AuthModalProps) {
             >
               Phone Number Login
             </button>
+
+            <button
+              onClick={() => setLoginMethod('password')}
+              className="w-full py-3 px-4 rounded-lg font-medium transition-colors"
+              style={{
+                backgroundColor: 'var(--color-bg-secondary)',
+                color: 'var(--color-text-primary)',
+                border: '1px solid var(--color-border-light)',
+              }}
+            >
+              Username & Password
+            </button>
           </div>
         ) : loginMethod === 'wechat' ? (
           <div className="space-y-4">
@@ -117,9 +130,24 @@ export function AuthModal({ onClose, onSuccess }: AuthModalProps) {
               Back
             </button>
           </div>
-        ) : (
+        ) : loginMethod === 'phone' ? (
           <div className="space-y-4">
             <PhoneLoginForm onSuccess={handlePhoneLoginSuccess} />
+            <button
+              onClick={() => setLoginMethod(null)}
+              className="w-full py-2 px-4 rounded text-sm"
+              style={{
+                backgroundColor: 'var(--color-bg-secondary)',
+                color: 'var(--color-text-primary)',
+                border: '1px solid var(--color-border-light)',
+              }}
+            >
+              Back
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <PasswordLoginForm onSuccess={handlePhoneLoginSuccess} />
             <button
               onClick={() => setLoginMethod(null)}
               className="w-full py-2 px-4 rounded text-sm"

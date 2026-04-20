@@ -2,15 +2,18 @@ import { useNavigate } from 'react-router-dom'
 import * as Icons from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { getCategoryInfo } from '@/config/tools'
+import { useAuth } from '@/contexts/AuthContext'
 import type { ToolItem } from '@/types/tool'
 
 interface ToolCardProps {
   tool: ToolItem
   className?: string
+  onAuthRequired?: () => void
 }
 
-export function ToolCard({ tool, className }: ToolCardProps) {
+export function ToolCard({ tool, className, onAuthRequired }: ToolCardProps) {
   const navigate = useNavigate()
+  const { status } = useAuth()
   const catInfo = getCategoryInfo(tool.category)
 
   // 动态获取 lucide-react 图标
@@ -18,7 +21,15 @@ export function ToolCard({ tool, className }: ToolCardProps) {
   const IconComponent = (Icons as any)[tool.icon] as React.FC<{ className?: string; style?: React.CSSProperties }> | undefined
 
   const handleClick = () => {
-    if (!tool.disabled) navigate(tool.path)
+    if (tool.disabled) return
+
+    // 检查是否需要登录
+    if (tool.requiresAuth && status !== 'authenticated') {
+      onAuthRequired?.()
+      return
+    }
+
+    navigate(tool.path)
   }
 
   return (

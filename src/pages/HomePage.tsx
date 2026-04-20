@@ -1,11 +1,14 @@
 import { Wrench } from "lucide-react";
+import { useState } from "react";
 import { SearchBar } from "@/components/SearchBar";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { ToolCard } from "@/components/ToolCard";
+import { AuthModal } from "@/components/AuthModal";
 import { useToolSearch } from "@/hooks/useToolSearch";
 
 export function HomePage() {
   const { query, setQuery, activeCategory, setActiveCategory, filteredTools } = useToolSearch();
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   return (
     <div
@@ -85,12 +88,21 @@ export function HomePage() {
                 <ToolCard
                   key={tool.id}
                   tool={tool}
+                  onAuthRequired={() => setShowAuthModal(true)}
                 />
               ))}
             </div>
           </>
         )}
       </main>
+
+      {/* 登录 Modal */}
+      {showAuthModal && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+          onSuccess={() => setShowAuthModal(false)}
+        />
+      )}
 
       <div className="text-center">v1.0.0</div>
       {/* 底部留白（避免被手势条遮挡） */}

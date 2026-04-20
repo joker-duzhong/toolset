@@ -53,6 +53,12 @@ export const CATEGORIES: ToolCategoryInfo[] = [
     textColor: 'text-emerald-600',
   },
   {
+    key: 'ai',
+    label: 'AI / 创意产品',
+    color: 'bg-fuchsia-100',
+    textColor: 'text-fuchsia-600',
+  },
+  {
     key: 'other',
     label: '其他',
     color: 'bg-gray-100',
@@ -334,6 +340,19 @@ export const TOOLS: ToolItem[] = [
     icon: 'GraduationCap',
     path: '/tools/zaiwen-gaokao',
     tags: ['高考', '树洞', '志愿', '战友', '社区'],
+    isNew: true,
+    requiresAuth: true,
+  },
+
+  // ── 影子董事会 ──────────────────────────────────
+  {
+    id: 'shadow-board',
+    name: '影子董事会',
+    description: '拒绝应声虫。真理越辩越明，产品越吵越精。',
+    category: 'ai',
+    icon: 'UsersRound',
+    path: '/tools/shadow-board',
+    tags: ['AI', '商业', '头脑风暴', '创意', '辩论'],
     isNew: true,
     requiresAuth: true,
   },

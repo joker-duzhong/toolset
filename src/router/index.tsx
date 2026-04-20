@@ -82,6 +82,9 @@ const ZaiwenGaokaoPage = lazy(() =>
 const ProjectSisyphusPage = lazy(() =>
   import('@/pages/tools/ProjectSisyphus').then((m) => ({ default: m.ProjectSisyphusPage }))
 )
+const ShadowBoardPage = lazy(() =>
+  import('@/pages/tools/ShadowBoard').then((m) => ({ default: m.ShadowBoardPage }))
+)
 
 // 页面加载占位
 function PageLoading() {
@@ -262,6 +265,18 @@ export function AppRouter() {
             <ProtectedToolWrapper requiresAuth>
               <ToolWrapper fullscreen>
                 <ProjectSisyphusPage />
+              </ToolWrapper>
+            </ProtectedToolWrapper>
+          }
+        />
+
+        {/* ── 影子董事会 ──────────────────────── */}
+        <Route
+          path="/tools/shadow-board"
+          element={
+            <ProtectedToolWrapper requiresAuth>
+              <ToolWrapper fullscreen>
+                <ShadowBoardPage />
               </ToolWrapper>
             </ProtectedToolWrapper>
           }
