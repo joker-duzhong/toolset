@@ -139,7 +139,7 @@ export function useBoardDebate(sessionId: string | null) {
             {
               id: `${Date.now()}-${Math.random()}`,
               session_id: data.session_id || '',
-              role: data.role,
+              role: data.role || 'Unknown',
               content: data.chunk || '',
               is_finalized: false,
               created_at: new Date().toISOString()
