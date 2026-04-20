@@ -6,7 +6,7 @@ import type { ToolCategory } from '@/types/tool'
 
 export function useToolSearch() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const { status } = useAuth()
+  const { status: _status } = useAuth()
 
   const query = searchParams.get('q') ?? ''
   const activeCategory = (searchParams.get('cat') ?? 'all') as ToolCategory | 'all'

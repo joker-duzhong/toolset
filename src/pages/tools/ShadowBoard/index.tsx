@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { SessionListView } from './views/SessionListView';
 import { BoardroomView } from './views/BoardroomView';
 import { AnimatePresence, motion } from 'framer-motion';
