@@ -85,6 +85,9 @@ const ProjectSisyphusPage = lazy(() =>
 const ShadowBoardPage = lazy(() =>
   import('@/pages/tools/ShadowBoard').then((m) => ({ default: m.ShadowBoardPage }))
 )
+const TypoCraftPage = lazy(() =>
+  import('@/pages/tools/TypoCraft').then((m) => ({ default: m.TypoCraftPage }))
+)
 
 // 页面加载占位
 function PageLoading() {
@@ -123,6 +126,16 @@ export function AppRouter() {
         <Routes>
         {/* 首页 */}
         <Route path="/" element={<HomePage />} />
+
+        {/* ── 言图 ──────────────────────── */}
+        <Route
+          path="/tools/typo-craft"
+          element={
+            <ToolWrapper fullscreen>
+              <TypoCraftPage />
+            </ToolWrapper>
+          }
+        />
 
         {/* ── 图片处理 ────────────────────── */}
         <Route

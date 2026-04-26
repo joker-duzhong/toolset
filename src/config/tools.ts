@@ -76,6 +76,18 @@ export const getCategoryInfo = (key: ToolCategory): ToolCategoryInfo =>
 // ────────────────────────────────────────────────
 export const TOOLS: ToolItem[] = [
   // ── 图片处理 ──────────────────────────────────
+  // ── AI 创意 ──────────────────────────────────
+  {
+    id: 'typo-craft',
+    name: '言图',
+    description: '一语成图，字见其境',
+    category: 'image',
+    icon: 'Sparkles',
+    path: '/tools/typo-craft',
+    tags: ['AI', '海报', '插图', '生成', '图片'],
+    isNew: true,
+  },
+
   {
     id: 'watermark-remover',
     name: '去水印',

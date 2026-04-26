@@ -19,7 +19,8 @@
       "Bash(curl -s http://localhost:8000/api/v1/openapi.json)",
       "Bash(curl -s http://localhost:8000/api/openapi.json)",
       "Bash(curl -s http://localhost:8000/redoc)",
-      "Bash(curl -s http://localhost:8000/api/v1/sisyphus/sessions)"
+      "Bash(curl -s http://localhost:8000/api/v1/sisyphus/sessions)",
+      "Bash(python -c ':*)"
     ]
   }
 }
