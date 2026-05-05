@@ -33,9 +33,10 @@ interface HomeViewProps {
   onUpdateFridgeNote: (note: string) => void;
   onRaiseFlag: () => void;
   onLowerFlag: () => void;
+  onManageAnniversaries: () => void;
 }
 
-export function HomeView({ data, myState, partnerState, onUpdateMood, onUpdateFridgeNote, onRaiseFlag, onLowerFlag }: HomeViewProps) {
+export function HomeView({ data, myState, partnerState, onUpdateMood, onUpdateFridgeNote, onRaiseFlag, onLowerFlag, onManageAnniversaries }: HomeViewProps) {
   const [showMoodPicker, setShowMoodPicker] = useState(false);
   const [_now, setNow] = useState(() => Date.now());
 
@@ -109,7 +110,11 @@ export function HomeView({ data, myState, partnerState, onUpdateMood, onUpdateFr
 
           {/* 下一个纪念日倒计时（保留了好看的组件） */}
           {nextAnniversary && (
-            <div className="w-full bg-[#FFF9F9] rounded-2xl p-4 border border-rose-100/50">
+            <motion.div
+              whileTap={{ scale: 0.98 }}
+              onClick={onManageAnniversaries}
+              className="w-full bg-[#FFF9F9] rounded-2xl p-4 border border-rose-100/50 cursor-pointer hover:bg-rose-50/50 transition-colors"
+            >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <Calendar
@@ -121,13 +126,27 @@ export function HomeView({ data, myState, partnerState, onUpdateMood, onUpdateFr
                 <span className="text-[10px] px-2 py-0.5 bg-rose-200 text-rose-600 rounded-full font-bold">倒计时</span>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-[10px] text-stone-400">我们将在这天迎来新的浪漫</p>
+                <p className="text-[10px] text-stone-400">点击管理所有纪念日</p>
                 <p className="text-xl font-bold text-rose-500">
                   {nextAnniversary.days_until}
                   <span className="text-xs ml-0.5">天</span>
                 </p>
               </div>
-            </div>
+            </motion.div>
+          )}
+
+          {/* 无纪念日时显示添加按钮 */}
+          {!nextAnniversary && (
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              onClick={onManageAnniversaries}
+              className="w-full bg-[#FFF9F9] rounded-2xl p-4 border-2 border-dashed border-rose-200 hover:border-rose-300 hover:bg-rose-50/50 transition-colors"
+            >
+              <div className="flex items-center justify-center gap-2 text-rose-400">
+                <Calendar size={16} />
+                <span className="text-sm font-medium">添加纪念日</span>
+              </div>
+            </motion.button>
           )}
         </div>
       </motion.div>

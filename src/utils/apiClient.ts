@@ -1,7 +1,7 @@
 import { getStoredTokens, setStoredTokens, clearStoredTokens } from "@/utils/storage";
 import toast from "react-hot-toast";
 
-export const API_BASE = import.meta.env.DEV ? "http://localhost:8000/api/v1" : "https://api.lxyy.fun/api/v1";
+export const API_BASE = false && import.meta.env.DEV ? "http://localhost:8000/api/v1" : "https://api.lxyy.fun/api/v1";
 
 export const WECHAT_APP_ID = import.meta.env.DEV ? "wxea6611dfdc3ecc4f" : "wx29ee8c1ad373bafa";
 

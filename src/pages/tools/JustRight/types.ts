@@ -40,6 +40,8 @@ export interface Memo {
   creator_uid: number
   content: string
   resources: StorageInfo[]
+  likes?: number  // 点赞数
+  liked_by_me?: boolean  // 我是否点赞
   is_deleted: boolean
   created_at: string
   updated_at: string
@@ -170,7 +172,10 @@ export interface HomeData {
 }
 
 // ============ Tab 类型 ============
-export type MainTab = 'home' | 'list' | 'manual' | 'wish'
+export type MainTab = 'home' | 'moments' | 'lists' | 'us'
+
+// 旧 Tab 值映射（用于兼容性）
+export type LegacyTab = 'list' | 'manual' | 'wish'
 
 export type ListSubTab = 'todo' | 'memo'
 

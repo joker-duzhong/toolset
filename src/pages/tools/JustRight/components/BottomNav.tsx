@@ -1,5 +1,5 @@
 // 底部导航栏
-import { Home, ListChecks, BookHeart, Gift } from 'lucide-react'
+import { Home, Camera, ListChecks, Users } from 'lucide-react'
 import type { MainTab } from '../types'
 import { cn } from '@/utils/cn'
 
@@ -9,10 +9,10 @@ interface BottomNavProps {
 }
 
 const navItems: { key: MainTab; label: string; icon: typeof Home }[] = [
-  { key: 'home', label: '我们', icon: Home },
-  { key: 'list', label: '清单', icon: ListChecks },
-  { key: 'manual', label: '说明书', icon: BookHeart },
-  { key: 'wish', label: '心愿', icon: Gift },
+  { key: 'home', label: '首页', icon: Home },
+  { key: 'moments', label: '时刻', icon: Camera },
+  { key: 'lists', label: '清单', icon: ListChecks },
+  { key: 'us', label: '我们', icon: Users },
 ]
 
 export function BottomNav({ active, onChange }: BottomNavProps) {

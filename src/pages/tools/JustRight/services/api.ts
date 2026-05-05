@@ -81,6 +81,12 @@ export const memoApi = {
     ),
 
   delete: (id: number) => apiClient<void>(`${BASE}/memos/${id}`, withAppHeader({ method: "DELETE" })),
+
+  // 点赞
+  like: (id: number) => apiClient<Memo>(`${BASE}/memos/${id}/like`, withAppHeader({ method: "POST" })),
+
+  // 取消点赞
+  unlike: (id: number) => apiClient<Memo>(`${BASE}/memos/${id}/unlike`, withAppHeader({ method: "DELETE" })),
 };
 
 

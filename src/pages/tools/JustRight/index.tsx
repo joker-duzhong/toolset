@@ -3,15 +3,17 @@
 import { useState, useCallback, useEffect } from 'react'
 import { BottomNav } from './components/BottomNav'
 import { HomeView } from './views/HomeView'
-import { ListView } from './views/ListView'
-import { ManualView } from './views/ManualView'
-import { WishView } from './views/WishView'
+import { ListsView } from './views/ListsView'
+import { UsView } from './views/UsView'
+import { MomentsView } from './views/MomentsView'
+import { AnniversaryManageView } from './views/AnniversaryManageView'
 import type {
   MainTab,
+  LegacyTab,
   TodoItem,
-  Memo,
+  // Memo,  // TODO: 备忘录功能暂时不用
   UserManual,
-  RouletteOption,
+  // RouletteOption,  // TODO: 转盘功能暂时不用
   WishlistItem,
   HomeData,
   UserState,
@@ -19,14 +21,27 @@ import type {
 import {
   homeApi,
   todoApi,
-  memoApi,
+  // memoApi,  // TODO: 备忘录功能暂时不用
   manualApi,
-  rouletteApi,
+  // rouletteApi,  // TODO: 转盘功能暂时不用
   wishlistApi,
   coupleStateApi,
   coupleApi,
 } from './services/api'
 import { CoupleBindView } from './views/CoupleBindView'
+
+// ============ Tab 兼容性处理 ============
+const normalizeTab = (tab: string | null): MainTab => {
+  if (!tab) return 'home'
+
+  const legacyMap: Record<LegacyTab, MainTab> = {
+    'list': 'lists',
+    'manual': 'us',
+    'wish': 'lists',
+  }
+
+  return (legacyMap[tab as LegacyTab] || tab) as MainTab
+}
 
 // ============ 空数据默认值 ============
 const emptyHomeData: HomeData = {
@@ -58,16 +73,27 @@ const emptyHomeData: HomeData = {
 
 // ============ 主组件 ============
 export function JustRightPage() {
-  const [activeTab, setActiveTab] = useState<MainTab>('home')
+  const [activeTab, setActiveTab] = useState<MainTab>(() => {
+    // 从 URL 参数或 localStorage 读取，支持旧 Tab 值
+    const urlTab = new URLSearchParams(window.location.search).get('tab')
+    const storedTab = localStorage.getItem('justright_active_tab')
+    return normalizeTab(urlTab || storedTab)
+  })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isBound, setIsBound] = useState<boolean | null>(null) // null 表示未检查
+  const [showAnniversaryManage, setShowAnniversaryManage] = useState(false) // 纪念日管理页面
+
+  // 保存 activeTab 到 localStorage
+  useEffect(() => {
+    localStorage.setItem('justright_active_tab', activeTab)
+  }, [activeTab])
 
   // 状态数据
   const [homeData, setHomeData] = useState<HomeData>(emptyHomeData)
   const [todos, setTodos] = useState<TodoItem[]>([])
-  const [memos, setMemos] = useState<Memo[]>([])
-  const [rouletteOptions, setRouletteOptions] = useState<RouletteOption[]>([])
+  // const [memos, setMemos] = useState<Memo[]>([])  // TODO: 备忘录功能暂时不用
+  // const [rouletteOptions, setRouletteOptions] = useState<RouletteOption[]>([])  // TODO: 转盘功能暂时不用
   const [wishlist, setWishlist] = useState<WishlistItem[]>([])
 
   // 当前用户 ID (用于判断身份)
@@ -109,18 +135,18 @@ export function JustRightPage() {
       setIsBound(true)
 
       // 并行加载所有数据
-      const [homeRes, todoRes, memoRes, rouletteRes, wishRes] = await Promise.all([
+      const [homeRes, todoRes, wishRes] = await Promise.all([
         homeApi.get(),
         todoApi.list(),
-        memoApi.list(),
-        rouletteApi.list(),
+        // memoApi.list(),  // TODO: 备忘录功能暂时不用
+        // rouletteApi.list(),  // TODO: 转盘功能暂时不用
         wishlistApi.list(),
       ])
 
       setHomeData(homeRes.data || emptyHomeData)
       setTodos(todoRes.data || [])
-      setMemos(memoRes.data?.items || [])
-      setRouletteOptions(rouletteRes.data || [])
+      // setMemos(memoRes.data?.items || [])
+      // setRouletteOptions(rouletteRes.data || [])
       setWishlist(wishRes.data || [])
     } catch (err) {
       console.error('Failed to load data:', err)
@@ -168,6 +194,8 @@ export function JustRightPage() {
     }
   }, [])
 
+  // TODO: 备忘录功能暂时不用
+  /*
   // 备忘录操作
   const handleAddMemo = useCallback(async (content: string, imageIds: string[]) => {
     try {
@@ -188,6 +216,7 @@ export function JustRightPage() {
       console.error('Failed to delete memo:', err)
     }
   }, [])
+  */
 
   // 说明书操作
   const handleUpdateManual = useCallback(async (data: Partial<UserManual>) => {
@@ -204,6 +233,8 @@ export function JustRightPage() {
     }
   }, [])
 
+  // TODO: 转盘功能暂时不用
+  /*
   // 转盘操作
   const handleAddRouletteOption = useCallback(
     async (title: string, category: 'food' | 'place' | 'other') => {
@@ -227,6 +258,7 @@ export function JustRightPage() {
       console.error('Failed to delete roulette option:', err)
     }
   }, [])
+  */
 
   // 心愿单操作
   const handleAddWish = useCallback(
@@ -238,12 +270,10 @@ export function JustRightPage() {
           creator_uid: currentUserId,
         })
         if (res.data) {
-          console.log("Added Wish:", res.data);
-          setWishlist((prev) => [res.data!, ...(prev)])
+          setWishlist((prev) => [res.data!, ...prev])
           setHomeData((prev) => ({ ...prev, upcoming_wishes: prev.upcoming_wishes + 1 }))
         }
-        console.log("Current Wishlist Count:", wishlist.length);
-       } catch (err) {
+      } catch (err) {
         console.error('Failed to add wish:', err)
       }
     },
@@ -406,6 +436,18 @@ export function JustRightPage() {
     )
   }
 
+  // 显示纪念日管理页面
+  if (showAnniversaryManage) {
+    return (
+      <AnniversaryManageView
+        onBack={() => {
+          setShowAnniversaryManage(false)
+          loadInitialData() // 重新加载数据以更新首页的纪念日倒计时
+        }}
+      />
+    )
+  }
+
   // 渲染当前视图
   const renderView = () => {
     switch (activeTab) {
@@ -419,40 +461,34 @@ export function JustRightPage() {
             onUpdateFridgeNote={handleUpdateFridgeNote}
             onRaiseFlag={handleRaiseFlag}
             onLowerFlag={handleLowerFlag}
+            onManageAnniversaries={() => setShowAnniversaryManage(true)}
           />
         )
-      case 'list':
+      case 'moments':
+        return <MomentsView currentUserId={currentUserId} />
+      case 'lists':
         return (
-          <ListView
+          <ListsView
             todos={todos}
-            memos={memos}
+            wishlist={wishlist}
+            currentUserId={currentUserId}
             onAddTodo={handleAddTodo}
             onToggleTodo={handleToggleTodo}
             onDeleteTodo={handleDeleteTodo}
-            onAddMemo={handleAddMemo}
-            onDeleteMemo={handleDeleteMemo}
-          />
-        )
-      case 'manual':
-        return (
-          <ManualView
-            myManual={homeData.manuals.mine}
-            partnerManual={homeData.manuals.ta}
-            onUpdate={handleUpdateManual}
-          />
-        )
-      case 'wish':
-        return (
-          <WishView
-            wishlist={wishlist}
-            rouletteOptions={rouletteOptions}
-            currentUserId={currentUserId}
             onAddWish={handleAddWish}
             onClaimWish={handleClaimWish}
             onFulfillWish={handleFulfillWish}
             onDeleteWish={handleDeleteWish}
-            onAddRouletteOption={handleAddRouletteOption}
-            onDeleteRouletteOption={handleDeleteRouletteOption}
+          />
+        )
+      case 'us':
+        return (
+          <UsView
+            homeData={homeData}
+            myManual={homeData.manuals.mine}
+            partnerManual={homeData.manuals.ta}
+            onUpdateManual={handleUpdateManual}
+            onManageAnniversaries={() => setShowAnniversaryManage(true)}
           />
         )
     }

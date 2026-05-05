@@ -20,7 +20,11 @@
       "Bash(curl -s http://localhost:8000/api/openapi.json)",
       "Bash(curl -s http://localhost:8000/redoc)",
       "Bash(curl -s http://localhost:8000/api/v1/sisyphus/sessions)",
-      "Bash(python -c ':*)"
+      "Bash(python -c ':*)",
+      "Bash(python3 -c \"import sys, json; data = json.load\\(sys.stdin\\); paths = {k: v for k, v in data['paths'].items\\(\\) if 'just-right' in k}; print\\(json.dumps\\(paths, indent=2, ensure_ascii=False\\)\\)\")",
+      "Bash(grep -n \"bg-\\\\[#FDFBF7\\\\]\" views/*.tsx)",
+      "Bash(grep -n \"transition\" views/*.tsx components/*.tsx)",
+      "Bash(grep -n \"sm:\\\\|md:\\\\|lg:\" views/*.tsx components/*.tsx)"
     ]
   }
 }
