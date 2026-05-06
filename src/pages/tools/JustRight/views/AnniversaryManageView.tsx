@@ -118,7 +118,7 @@ export function AnniversaryManageView({ onBack }: AnniversaryManageViewProps) {
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] font-sans pb-24">
-      <div className="sticky top-0 z-20 bg-[#FAFAFA]/90 backdrop-blur-md px-4 pt-12 pb-4 flex items-center justify-between">
+      <div className="sticky top-0 z-20 bg-[#FAFAFA]/90 backdrop-blur-md px-4 pt-2 pb-4 flex items-center justify-between">
         <button onClick={onBack} className="p-2 -ml-2 text-[#666]">
           <ChevronLeft size={24} />
         </button>

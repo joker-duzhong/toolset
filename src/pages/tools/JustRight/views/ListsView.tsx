@@ -41,9 +41,9 @@ export function ListsView({
   return (
     <div className="min-h-full bg-[#FFFDFB] pb-24">
       {/* 顶部导航栏 */}
-      <div className="sticky top-0 z-10 bg-[#FFFDFB]/90 backdrop-blur-md pb-4 pt-8">
+      <div className="sticky top-0 z-99 bg-[#FFFDFB]/90 backdrop-blur-md pb-4 pt-8">
         <div className="px-6 flex flex-col items-center">
-          <h1 className="font-bold text-[#4A4036] text-lg mb-6">清单</h1>
+          {/* <h1 className="font-bold text-[#4A4036] text-lg mb-6">清单</h1> */}
 
           {/* 分段控制器 - 完全按照设计图还原 */}
           <div className="w-full px-4">

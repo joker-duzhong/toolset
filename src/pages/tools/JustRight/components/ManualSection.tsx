@@ -94,7 +94,7 @@ export function ManualCard({ manual, isOwner, onClose, onUpdate }: ManualCardPro
       className="fixed inset-0 z-50 bg-[#FAFAFA] overflow-y-auto"
     >
       {/* 头部导航 */}
-      <div className="sticky top-0 bg-[#FAFAFA]/90 backdrop-blur-md z-10 px-4 pt-12 pb-4 flex items-center justify-between">
+      <div className="sticky top-0 bg-[#FAFAFA]/90 backdrop-blur-md z-10 px-4 pt-4 pb-4 flex items-center justify-between">
         <button onClick={onClose} className="p-2 text-[#666]">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
@@ -106,18 +106,18 @@ export function ManualCard({ manual, isOwner, onClose, onUpdate }: ManualCardPro
 
       {/* Tabs */}
       <div className="px-4 mb-6">
-        <div className="flex justify-between items-center px-2">
+        <div className="flex items-center px-2">
           {Tabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`pb-2 text-sm transition-colors relative ${
+              className={`pb-2 pr-6 text-sm transition-colors relative ${
                 activeTab === tab ? 'text-[#FF7A59] font-bold' : 'text-[#999] font-medium'
               }`}
             >
               {tab}
               {activeTab === tab && (
-                <motion.div layoutId="tabLine" className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-[#FF7A59] rounded-full" />
+                <motion.div layoutId="tabLine" className="absolute bottom-0 left-1/4 right-2/4 h-0.5 bg-[#FF7A59] rounded-full" />
               )}
             </button>
           ))}

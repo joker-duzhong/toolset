@@ -107,15 +107,9 @@ export function UsView({ homeData, myManual, partnerManual, onUpdateManual, onMa
   return (
     <div className="min-h-[100%] bg-[#FAFAFA] font-sans relative overflow-hidden">
       {/* --- 顶部区域 --- */}
-      <div className="pt-4 pb-6 px-5 relative">
+      <div className="pt-4 px-5 relative">
         {/* 背景光晕装饰 */}
         <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-[#FFF0E5] to-transparent opacity-60 z-0" />
-
-        {/* <div className="relative z-10 flex items-center justify-between mb-8">
-          <button className="p-1"><Icons.Back /></button>
-          <h1 className="font-bold text-[#333] text-lg tracking-wider">我们</h1>
-          <button className="p-1"><Icons.Settings /></button>
-        </div> */}
       </div>
 
       <div className="px-5 space-y-8 relative z-10">
@@ -171,9 +165,7 @@ export function UsView({ homeData, myManual, partnerManual, onUpdateManual, onMa
               onClick={onManageAnniversaries}
               className="bg-gradient-to-r from-[#FFF6F4] to-[#FFF0F0] rounded-2xl p-5 border border-[#FFE8E3] relative overflow-hidden shadow-sm"
             >
-              <div className="absolute right-2 bottom-2 opacity-50 text-6xl">
-                {closestAnniversary.anniversary.icon || "✨"}
-              </div>
+              <div className="absolute right-2 bottom-2 opacity-50 text-6xl">{closestAnniversary.anniversary.icon || "✨"}</div>
 
               <div className="relative z-10">
                 <div className="flex items-center gap-2 mb-3">
