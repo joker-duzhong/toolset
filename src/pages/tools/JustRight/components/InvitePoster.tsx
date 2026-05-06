@@ -1,6 +1,7 @@
 // 邀请海报组件 - 包含二维码，用于扫描邀请
 import { useEffect, useRef } from 'react'
 import QRCode from 'qrcode'
+import { copyToClipboard } from '../utils/copy'
 
 interface InvitePosterProps {
   inviteCode: string
@@ -52,7 +53,7 @@ export function InvitePoster({ inviteCode, onClose }: InvitePosterProps) {
   const handleCopyLink = async () => {
     const inviteUrl = `${window.location.origin}${window.location.pathname}?invite_code=${inviteCode}`
     try {
-      await navigator.clipboard.writeText(inviteUrl)
+      await copyToClipboard(inviteUrl)
       alert('邀请链接已复制到剪贴板')
     } catch (err) {
       console.error('Failed to copy:', err)

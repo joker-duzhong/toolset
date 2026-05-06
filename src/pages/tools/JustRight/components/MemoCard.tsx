@@ -4,14 +4,16 @@ import { ImagePlus, X, Trash2 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import type { Memo } from "../types";
 import { storageApi, type StorageInfo } from "@/common/api/storage";
+import { APP_KEY as JUST_RIGHT_APP_KEY } from "../services/api";
 
 interface MemoCardProps {
   memo: Memo;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
 }
 
 export function MemoCard({ memo, onDelete }: MemoCardProps) {
   const [showActions, setShowActions] = useState(false);
+  const resources = memo.resources || [];
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -25,15 +27,15 @@ export function MemoCard({ memo, onDelete }: MemoCardProps) {
       onMouseLeave={() => setShowActions(false)}
     >
       {/* 图片区域 */}
-      {memo.resources?.length > 0 && (
-        <div className={cn("grid gap-1.5 p-3", memo.resources.length === 1 ? "grid-cols-1" : "grid-cols-2")}>
-          {memo.resources.slice(0, 4).map((img, index) => (
+      {resources.length > 0 && (
+        <div className={cn("grid gap-1.5 p-3", resources.length === 1 ? "grid-cols-1" : "grid-cols-2")}>
+          {resources.slice(0, 4).map((img, index) => (
             <div
               key={index}
               className="aspect-square bg-stone-100 rounded-xl overflow-hidden relative group/img"
             >
               <img
-                src={img.thumb_url}
+                src={img.thumb_url || img.url}
                 alt=""
                 className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-500"
                 loading="lazy"
@@ -95,7 +97,7 @@ export function MemoCreateModal({ open, onClose, onSubmit }: MemoCreateModalProp
     setUploading(true);
     try {
       const uploadPromises = [...files].map(async (file) => {
-        const res = await storageApi.upload(file);
+        const res = await storageApi.upload(file, { appKey: JUST_RIGHT_APP_KEY });
         return res.data || {} as StorageInfo;
       });
 
@@ -167,7 +169,7 @@ export function MemoCreateModal({ open, onClose, onSubmit }: MemoCreateModalProp
                 className="relative aspect-square group/img-preview"
               >
                 <img
-                  src={img.thumb_url}
+                  src={img.thumb_url || img.url}
                   alt=""
                   className="w-full h-full object-cover rounded-xl"
                 />

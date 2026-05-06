@@ -5,10 +5,28 @@
 // ────────────────────────────────────────────────
 
 import { apiClient } from "@/utils/apiClient";
-import type { TodoItem, Memo, UserManual, RouletteOption, WishlistItem, Anniversary, CoupleState, HomeData, Couple, PaginatedResponse, UserState } from "../types";
+import type {
+  TodoItem,
+  Memo,
+  UserManual,
+  RouletteOption,
+  WishlistItem,
+  WishlistFulfillPayload,
+  WishlistItemPayload,
+  WishlistItemUpdatePayload,
+  WishlistStatus,
+  Anniversary,
+  AnniversaryPayload,
+  UpcomingAnniversary,
+  CoupleState,
+  HomeData,
+  Couple,
+  PaginatedResponse,
+  UserState,
+} from "../types";
 
 const BASE = "/just-right";
-const APP_KEY = "hope_just_right";
+export const APP_KEY = "hope_just_right";
 
 /** 统一注入 app header */
 function withAppHeader(init?: RequestInit): RequestInit {
@@ -34,7 +52,7 @@ export const coupleApi = {
       }),
     ),
 
-  leave: () => apiClient<void>(`${BASE}/couples/leave`, withAppHeader({ method: "POST" })),
+  leave: () => apiClient<boolean>(`${BASE}/couples/me/dissolve`, withAppHeader({ method: "POST" })),
 };
 
 // ============ 首页数据 ============
@@ -76,17 +94,64 @@ export const memoApi = {
       `${BASE}/memos`,
       withAppHeader({
         method: "POST",
-        body: JSON.stringify({ content, image_urls: imageIds }),
+        body: JSON.stringify({ content, resource_ids: imageIds }),
       }),
     ),
 
-  delete: (id: number) => apiClient<void>(`${BASE}/memos/${id}`, withAppHeader({ method: "DELETE" })),
+  update: (id: string, data: { content?: string | null; resource_ids?: string[] | null; is_pinned?: boolean | null }) =>
+    apiClient<Memo>(
+      `${BASE}/memos/${id}`,
+      withAppHeader({
+        method: "PUT",
+        body: JSON.stringify(data),
+      }),
+    ),
 
-  // 点赞
-  like: (id: number) => apiClient<Memo>(`${BASE}/memos/${id}/like`, withAppHeader({ method: "POST" })),
+  delete: (id: string) => apiClient<boolean>(`${BASE}/memos/${id}`, withAppHeader({ method: "DELETE" })),
 
-  // 取消点赞
-  unlike: (id: number) => apiClient<Memo>(`${BASE}/memos/${id}/unlike`, withAppHeader({ method: "DELETE" })),
+  toggleLike: (id: string) => apiClient<Memo>(`${BASE}/memos/${id}/like`, withAppHeader({ method: "POST" })),
+
+  comment: (id: string, content: string) =>
+    apiClient<Memo>(
+      `${BASE}/memos/${id}/comment`,
+      withAppHeader({
+        method: "POST",
+        body: JSON.stringify({ content }),
+      }),
+    ),
+
+  togglePin: (id: string) => apiClient<Memo>(`${BASE}/memos/${id}/pin`, withAppHeader({ method: "POST" })),
+
+  updateComment: (memoId: string, commentId: string, content: string) =>
+    apiClient<Memo>(
+      `${BASE}/memos/${memoId}/comments/${commentId}`,
+      withAppHeader({
+        method: "PUT",
+        body: JSON.stringify({ content }),
+      }),
+    ),
+
+  deleteComment: (memoId: string, commentId: string) =>
+    apiClient<Memo>(
+      `${BASE}/memos/${memoId}/comments/${commentId}`,
+      withAppHeader({
+        method: "DELETE",
+      }),
+    ),
+
+  search: (params?: { keyword?: string; start_date?: string; end_date?: string; page?: number; page_size?: number }) => {
+    const query = new URLSearchParams()
+    if (params?.keyword) query.set("keyword", params.keyword)
+    if (params?.start_date) query.set("start_date", params.start_date)
+    if (params?.end_date) query.set("end_date", params.end_date)
+    if (params?.page) query.set("page", String(params.page))
+    if (params?.page_size) query.set("page_size", String(params.page_size))
+
+    return apiClient<PaginatedResponse<Memo>>(
+      `${BASE}/memos/search${query.toString() ? `?${query.toString()}` : ""}`,
+      withAppHeader(),
+    )
+  },
 };
 
 
@@ -122,9 +187,9 @@ export const rouletteApi = {
 
 // ============ 心愿单 API ============
 export const wishlistApi = {
-  list: () => apiClient<WishlistItem[]>(`${BASE}/wishlist`, withAppHeader()),
+  list: (status?: WishlistStatus) => apiClient<WishlistItem[]>(`${BASE}/wishlist${status ? `?status=${status}` : ""}`, withAppHeader()),
 
-  add: (item: { title: string; url?: string; price?: number; image_url?: string; description?: string; couple_id: number; creator_uid: number }) =>
+  add: (item: WishlistItemPayload) =>
     apiClient<WishlistItem>(
       `${BASE}/wishlist`,
       withAppHeader({
@@ -133,18 +198,40 @@ export const wishlistApi = {
       }),
     ),
 
-  claim: (id: number) => apiClient<WishlistItem>(`${BASE}/wishlist/${id}/claim`, withAppHeader({ method: "POST" })),
+  update: (id: string, item: WishlistItemUpdatePayload) =>
+    apiClient<WishlistItem>(
+      `${BASE}/wishlist/${id}`,
+      withAppHeader({
+        method: "PUT",
+        body: JSON.stringify(item),
+      }),
+    ),
 
-  fulfill: (id: number) => apiClient<WishlistItem>(`${BASE}/wishlist/${id}/fulfill`, withAppHeader({ method: "POST" })),
+  claim: (id: string) => apiClient<WishlistItem>(`${BASE}/wishlist/${id}/claim`, withAppHeader({ method: "POST" })),
 
-  delete: (id: number) => apiClient<void>(`${BASE}/wishlist/${id}`, withAppHeader({ method: "DELETE" })),
+  unclaim: (id: string) => apiClient<WishlistItem>(`${BASE}/wishlist/${id}/unclaim`, withAppHeader({ method: "POST" })),
+
+  fulfill: (id: string) => apiClient<WishlistItem>(`${BASE}/wishlist/${id}/fulfill`, withAppHeader({ method: "POST" })),
+
+  fulfillWithRecord: (id: string, payload: WishlistFulfillPayload) =>
+    apiClient<WishlistItem>(
+      `${BASE}/wishlist/${id}/fulfill-with-record`,
+      withAppHeader({
+        method: "POST",
+        body: JSON.stringify(payload),
+      }),
+    ),
+
+  delete: (id: string) => apiClient<boolean>(`${BASE}/wishlist/${id}`, withAppHeader({ method: "DELETE" })),
 };
 
 // ============ 纪念日 API ============
 export const anniversaryApi = {
   list: () => apiClient<Anniversary[]>(`${BASE}/anniversaries`, withAppHeader()),
 
-  add: (data: Omit<Anniversary, "id" | "couple_id" | "is_deleted" | "created_at" | "updated_at">) =>
+  upcoming: (limit = 5) => apiClient<UpcomingAnniversary[]>(`${BASE}/anniversaries/upcoming?limit=${limit}`, withAppHeader()),
+
+  add: (data: AnniversaryPayload) =>
     apiClient<Anniversary>(
       `${BASE}/anniversaries`,
       withAppHeader({
@@ -153,7 +240,7 @@ export const anniversaryApi = {
       }),
     ),
 
-  update: (id: number, data: Partial<Omit<Anniversary, "id" | "couple_id" | "is_deleted" | "created_at" | "updated_at">>) =>
+  update: (id: string, data: Partial<AnniversaryPayload>) =>
     apiClient<Anniversary>(
       `${BASE}/anniversaries/${id}`,
       withAppHeader({
@@ -162,7 +249,7 @@ export const anniversaryApi = {
       }),
     ),
 
-  delete: (id: number) => apiClient<void>(`${BASE}/anniversaries/${id}`, withAppHeader({ method: "DELETE" })),
+  delete: (id: string) => apiClient<boolean>(`${BASE}/anniversaries/${id}`, withAppHeader({ method: "DELETE" })),
 };
 
 // ============ 情侣状态 API ============
@@ -170,11 +257,11 @@ export const coupleStateApi = {
   get: () => apiClient<CoupleState>(`${BASE}/state`, withAppHeader()),
 
   updateMood: (mood: UserState["mood"], moodNote?: string) =>
-    apiClient<UserState>(
+    apiClient<CoupleState>(
       `${BASE}/state`,
       withAppHeader({
         method: "PUT",
-        body: JSON.stringify({ mood, mood_note: moodNote }),
+        body: JSON.stringify({ mood, note: moodNote }),
       }),
     ),
 
@@ -187,24 +274,4 @@ export const coupleStateApi = {
       }),
     ),
 
-  raiseWhiteFlag: () =>
-    apiClient<UserState>(
-      `${BASE}/state`,
-      withAppHeader({
-        method: "PUT",
-        body: JSON.stringify({ white_flag: true }),
-      }),
-    ),
-
-  lowerWhiteFlag: () =>
-    apiClient<UserState>(
-      `${BASE}/state`,
-      withAppHeader({
-        method: "PUT",
-        body: JSON.stringify({ white_flag: false }),
-      }),
-    ),
-
-  checkWhiteFlag: () =>
-    apiClient<{ has_flag: boolean }>(`${BASE}/state/white-flag-check`, withAppHeader()),
 };

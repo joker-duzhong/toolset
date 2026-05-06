@@ -6,7 +6,7 @@ interface UploadedImage {
   previewUrl: string;
 }
 
-export function useImageUpload(maxImages = 4) {
+export function useImageUpload(maxImages = 4, appKey?: string) {
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [uploading, setUploading] = useState(false);
 
@@ -17,7 +17,8 @@ export function useImageUpload(maxImages = 4) {
       setUploading(true);
       try {
         const uploadPromises = [...files].slice(0, maxImages - images.length).map(async (file) => {
-          const res = await storageApi.upload(file);
+          if (!appKey) return null;
+          const res = await storageApi.upload(file, { appKey });
           if (res.data) {
             return {
               id: res.data.id,
@@ -36,7 +37,7 @@ export function useImageUpload(maxImages = 4) {
         setUploading(false);
       }
     },
-    [images, maxImages]
+    [appKey, images, maxImages]
   );
 
   const removeImage = useCallback((index: number) => {

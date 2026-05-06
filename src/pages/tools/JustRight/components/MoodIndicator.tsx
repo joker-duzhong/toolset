@@ -1,136 +1,95 @@
-// 心情状态指示器
-import { cn } from '@/utils/cn'
+import { cn } from "@/utils/cn";
+import { Smile, Frown, Flame, MoonStar, Thermometer, Heart, Droplets, Flag, type LucideIcon } from "lucide-react";
 
-type MoodType = 'happy' | 'sad' | 'angry' | 'tired' | 'sick' | 'love' | 'period'
+type MoodType = "happy" | "sad" | "angry" | "tired" | "sick" | "love" | "period" | "forgive";
 
 interface MoodIndicatorProps {
-  mood?: MoodType
-  note?: string
-  size?: 'sm' | 'md' | 'lg'
-  showLabel?: boolean
+  mood?: MoodType;
+  note?: string;
+  size?: "sm" | "md" | "lg";
+  showLabel?: boolean;
 }
 
-const moodConfig: Record<MoodType, { emoji: string; label: string; color: string; bg: string }> = {
-  happy: { emoji: '😊', label: '开心', color: 'text-amber-600', bg: 'bg-amber-100' },
-  sad: { emoji: '😢', label: '有点难过', color: 'text-blue-600', bg: 'bg-blue-100' },
-  angry: { emoji: '😤', label: '生气中', color: 'text-red-600', bg: 'bg-red-100' },
-  tired: { emoji: '😫', label: '好累', color: 'text-stone-600', bg: 'bg-stone-100' },
-  sick: { emoji: '🤒', label: '不舒服', color: 'text-green-600', bg: 'bg-green-100' },
-  love: { emoji: '🥰', label: '想你啦', color: 'text-pink-600', bg: 'bg-pink-100' },
-  period: { emoji: '🩸', label: '特殊时期', color: 'text-rose-600', bg: 'bg-rose-100' },
-}
+// 使用高度定制的图标代替简单 emoji，色彩更符合暖色主调
+const moodConfig: Record<MoodType, { icon: LucideIcon; label: string; color: string; bg: string; fill: string }> = {
+  happy: { icon: Smile, label: "开心", color: "text-[#FF8A65]", bg: "bg-[#FFF3EE]", fill: "fill-[#FF8A65]/20" },
+  sad: { icon: Frown, label: "难过", color: "text-[#8BA7D5]", bg: "bg-[#F4F8FF]", fill: "fill-[#8BA7D5]/20" },
+  angry: { icon: Flame, label: "生气", color: "text-[#FA705A]", bg: "bg-[#FFF0ED]", fill: "fill-[#FA705A]/20" },
+  tired: { icon: MoonStar, label: "好累", color: "text-[#A8A29E]", bg: "bg-[#F5F5F4]", fill: "fill-[#A8A29E]/20" },
+  sick: { icon: Thermometer, label: "生病", color: "text-[#7CB342]", bg: "bg-[#F4F9F0]", fill: "fill-[#7CB342]/20" },
+  love: { icon: Heart, label: "想你", color: "text-[#F44380]", bg: "bg-[#FFF2F6]", fill: "fill-[#F44380]/20" },
+  period: { icon: Droplets, label: "姨妈期", color: "text-[#E53935]", bg: "bg-[#FFEBEE]", fill: "fill-[#E53935]/20" },
+  forgive: { icon: Flag, label: "求原谅", color: "text-[#FA705A]", bg: "bg-[#FFF3EE]", fill: "fill-[#FA705A]/15" },
+};
 
 const sizeClasses = {
-  sm: 'w-8 h-8 text-lg',
-  md: 'w-12 h-12 text-2xl',
-  lg: 'w-16 h-16 text-3xl',
+  sm: "w-10 h-10",
+  md: "w-14 h-14",
+  lg: "w-20 h-20",
+};
+
+const iconSizes = { sm: 20, md: 28, lg: 40 };
+
+export function getMoodLabel(mood?: MoodType) {
+  return mood ? moodConfig[mood]?.label || mood : "";
 }
 
-export function MoodIndicator({ mood, note, size = 'md', showLabel = false }: MoodIndicatorProps) {
-  if (!mood) return null
+export function isForgiveMood(mood?: MoodType) {
+  return mood === "forgive";
+}
 
-  const config = moodConfig[mood]
+export function MoodIndicator({ mood, note, size = "md", showLabel = false }: MoodIndicatorProps) {
+  if (!mood) return null;
+
+  const config = moodConfig[mood];
+  const Icon = config.icon;
 
   return (
-    <div className="flex items-center gap-2">
-      <div
-        className={cn(
-          'rounded-full flex items-center justify-center',
-          sizeClasses[size],
-          config.bg
-        )}
-      >
-        {config.emoji}
+    <div className="flex flex-col items-center gap-1.5">
+      <div className={cn("rounded-full flex items-center justify-center shadow-sm relative", sizeClasses[size], config.bg)}>
+        <Icon
+          size={iconSizes[size]}
+          className={cn(config.color, config.fill)}
+          strokeWidth={2}
+        />
       </div>
-      {showLabel && (
-        <span className={cn('text-sm font-medium', config.color)}>
-          {config.label}
-        </span>
-      )}
-      {note && (
-        <span className="text-xs text-stone-500 truncate max-w-[120px]">
-          {note}
-        </span>
-      )}
+      {showLabel && <span className={cn("text-sm font-bold", config.color)}>{config.label}</span>}
+      {note && <span className="text-[10px] text-stone-400 truncate max-w-[100px] text-center">{note}</span>}
     </div>
-  )
+  );
 }
 
-// 心情选择器
 interface MoodPickerProps {
-  value?: MoodType
-  onChange: (mood: MoodType) => void
+  value?: MoodType;
+  onChange: (mood: MoodType) => void;
 }
 
 export function MoodPicker({ value, onChange }: MoodPickerProps) {
-  const moods = Object.entries(moodConfig) as [MoodType, typeof moodConfig.happy][]
+  const moods = Object.entries(moodConfig) as [MoodType, typeof moodConfig.happy][];
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {moods.map(([key, config]) => (
-        <button
-          key={key}
-          onClick={() => onChange(key)}
-          className={cn(
-            'flex items-center gap-1 px-3 py-2 rounded-full transition-all duration-200',
-            value === key
-              ? `${config.bg} ring-2 ring-offset-1 ring-current ${config.color} scale-105`
-              : 'bg-stone-100 text-stone-400 hover:bg-stone-200'
-          )}
-        >
-          <span>{config.emoji}</span>
-          <span className="text-xs">{config.label}</span>
-        </button>
-      ))}
+    <div className="grid grid-cols-4 gap-y-6 gap-x-2">
+      {moods.map(([key, config]) => {
+        const Icon = config.icon;
+        const isSelected = value === key;
+
+        return (
+          <button
+            key={key}
+            onClick={() => onChange(key)}
+            className="flex flex-col items-center gap-2 group outline-none"
+          >
+            <div className={cn("w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ease-out", isSelected ? `${config.bg} shadow-[0_0_20px_rgba(0,0,0,0.08)] scale-110 ring-4 ring-white` : "bg-stone-50 hover:bg-stone-100")}>
+              <Icon
+                size={28}
+                className={cn("transition-colors duration-300", isSelected ? cn(config.color, config.fill) : "text-stone-300 fill-transparent")}
+                strokeWidth={isSelected ? 2.5 : 2}
+              />
+            </div>
+            <span className={cn("text-[11px] font-bold transition-colors", isSelected ? config.color : "text-stone-400")}>{config.label}</span>
+          </button>
+        );
+      })}
     </div>
-  )
-}
-
-// 心情状态预警卡片
-interface MoodAlertCardProps {
-  mood?: MoodType
-  note?: string
-  partnerName?: string
-}
-
-export function MoodAlertCard({ mood, note, partnerName }: MoodAlertCardProps) {
-  if (!mood || mood === 'happy' || mood === 'love') return null
-
-  const config = moodConfig[mood]
-
-  // 需要特别关注的心情
-  const alerts: Record<MoodType, string> = {
-    happy: '',
-    love: '',
-    sad: '需要抱抱',
-    angry: '⚠️ 小心翼翼模式',
-    tired: '需要休息',
-    sick: '需要照顾',
-    period: '🩸 多喝热水',
-  }
-
-  return (
-    <div
-      className={cn(
-        'p-4 rounded-2xl border',
-        config.bg,
-        'border-current/20'
-      )}
-    >
-      <div className="flex items-center gap-3">
-        <span className="text-2xl">{config.emoji}</span>
-        <div>
-          <p className={cn('font-medium', config.color)}>
-            {partnerName} {config.label}
-          </p>
-          {note && (
-            <p className="text-sm text-stone-500 mt-1">{note}</p>
-          )}
-          {alerts[mood] && (
-            <p className="text-xs text-stone-400 mt-1">{alerts[mood]}</p>
-          )}
-        </div>
-      </div>
-    </div>
-  )
+  );
 }

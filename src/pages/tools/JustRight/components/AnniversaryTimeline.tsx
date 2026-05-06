@@ -7,7 +7,7 @@ import { formatDate, daysBetween } from '../utils/lunar'
 interface AnniversaryTimelineProps {
   anniversaries: Anniversary[]
   onEdit: (anniversary: Anniversary) => void
-  onDelete: (id: number) => void
+  onDelete: (id: string) => void
 }
 
 export function AnniversaryTimeline({ anniversaries, onEdit, onDelete }: AnniversaryTimelineProps) {
@@ -88,7 +88,7 @@ function AnniversaryCard({
   isUpcoming: boolean
   isFirst: boolean
   onEdit: (anniversary: Anniversary) => void
-  onDelete: (id: number) => void
+  onDelete: (id: string) => void
 }) {
   const today = new Date().toISOString().split('T')[0]
   const daysUntil = daysBetween(today, anniversary.target_date)

@@ -1,206 +1,184 @@
-// 纪念日表单模态框
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { X, Calendar, Repeat, Moon, Sun } from 'lucide-react'
-import type { Anniversary } from '../types'
+import { useEffect, useState, type FormEvent } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Loader2, Moon, Repeat, X } from 'lucide-react'
+import type { Anniversary, AnniversaryPayload } from '../types'
+import { cn } from '@/utils/cn'
 
 interface AnniversaryFormModalProps {
   isOpen: boolean
+  initialValue?: Anniversary | null
   onClose: () => void
-  onSubmit: (data: Omit<Anniversary, 'id' | 'couple_id' | 'is_deleted' | 'created_at' | 'updated_at'>) => void
-  initialData?: Anniversary
+  onSubmit: (data: AnniversaryPayload) => Promise<void> | void
 }
 
-const ICONS = ['🎂', '💝', '🎉', '🌹', '💍', '🎁', '✨', '💕', '🎈', '🌟']
+const ICONS = ['🎂', '💝', '✈️', '🏠', '🎁', '💍', '✨']
 
-export function AnniversaryFormModal({ isOpen, onClose, onSubmit, initialData }: AnniversaryFormModalProps) {
-  const [title, setTitle] = useState(initialData?.title || '')
-  const [targetDate, setTargetDate] = useState(initialData?.target_date || '')
-  const [type, setType] = useState<'countup' | 'countdown'>(initialData?.type || 'countdown')
-  const [repeatType, setRepeatType] = useState<'yearly' | 'monthly' | 'once'>(initialData?.repeat_type || 'yearly')
-  const [isLunar, setIsLunar] = useState(initialData?.is_lunar || false)
-  const [icon, setIcon] = useState(initialData?.icon || '🎂')
-  const [description, setDescription] = useState(initialData?.description || '')
+const repeatOptions: Array<{ value: NonNullable<AnniversaryPayload['repeat_type']>; label: string }> = [
+  { value: 'yearly', label: '每年' },
+  { value: 'monthly', label: '每月' },
+  { value: 'once', label: '仅一次' },
+]
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+export function AnniversaryFormModal({ isOpen, initialValue, onClose, onSubmit }: AnniversaryFormModalProps) {
+  const [title, setTitle] = useState('')
+  const [targetDate, setTargetDate] = useState('')
+  const [icon, setIcon] = useState('🎂')
+  const [isLunar, setIsLunar] = useState(false)
+  const [repeatType, setRepeatType] = useState<NonNullable<AnniversaryPayload['repeat_type']>>('yearly')
+  const [submitting, setSubmitting] = useState(false)
+  const isEditMode = Boolean(initialValue)
 
-    if (!title.trim() || !targetDate) {
-      return
-    }
+  useEffect(() => {
+    if (!isOpen) return
 
-    onSubmit({
-      title: title.trim(),
-      target_date: targetDate,
-      type,
-      repeat_type: repeatType,
-      is_lunar: isLunar,
-      icon,
-      description: description.trim() || undefined,
-    })
+    setTitle(initialValue?.title || '')
+    setTargetDate(initialValue?.target_date || '')
+    setIcon(initialValue?.icon || '🎂')
+    setIsLunar(Boolean(initialValue?.is_lunar))
+    setRepeatType(initialValue?.repeat_type || 'yearly')
+  }, [initialValue, isOpen])
 
+  const resetForm = () => {
+    setTitle('')
+    setTargetDate('')
+    setIcon('🎂')
+    setIsLunar(false)
+    setRepeatType('yearly')
+  }
+
+  const handleClose = () => {
+    if (submitting) return
+    resetForm()
     onClose()
+  }
+
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault()
+    const trimmedTitle = title.trim()
+    if (!trimmedTitle || !targetDate) return
+
+    try {
+      setSubmitting(true)
+      await onSubmit({
+        title: trimmedTitle,
+        target_date: targetDate,
+        is_lunar: isLunar,
+        repeat_type: repeatType,
+        icon,
+      })
+      resetForm()
+      onClose()
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* 背景遮罩 */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-stone-900/20 backdrop-blur-sm z-[60]"
+            onClick={handleClose}
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[60]"
           />
 
-          {/* 表单模态框 */}
           <motion.div
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-[2.5rem] p-6 z-[70] shadow-2xl max-h-[90vh] overflow-y-auto"
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="fixed bottom-0 left-0 right-0 bg-[#FAFAFA] rounded-t-[32px] p-6 pb-12 z-[70] shadow-2xl"
           >
-            {/* 标题栏 */}
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-stone-800 text-lg">
-                {initialData ? '编辑纪念日' : '添加纪念日'}
-              </h3>
+            <div className="w-12 h-1.5 bg-[#E5E5E5] rounded-full mx-auto mb-6" />
+
+            <div className="mb-6 flex items-center justify-between">
+              <div className="w-8" />
+              <h3 className="font-bold text-[#333] text-lg text-center">{isEditMode ? '编辑纪念日' : '添加纪念日'}</h3>
               <button
-                onClick={onClose}
-                className="p-2 bg-stone-50 rounded-full text-stone-400 hover:bg-stone-100 transition-colors"
+                type="button"
+                onClick={handleClose}
+                disabled={submitting}
+                className="rounded-full bg-white p-2 text-[#999] shadow-sm disabled:opacity-50"
               >
-                <X size={20} />
+                <X size={16} />
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              {/* 标题 */}
-              <div>
-                <label className="block text-sm font-medium text-stone-700 mb-2">
-                  纪念日名称
-                </label>
+              <div className="bg-white p-4 rounded-2xl shadow-sm border border-[#F5F5F5]">
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="例如：我们的第一次约会"
-                  className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent"
+                  placeholder="纪念日名称 (如：第一次旅行)"
+                  maxLength={100}
+                  className="w-full bg-transparent text-[#333] font-medium outline-none placeholder-[#999]"
                   required
                 />
               </div>
 
-              {/* 日期 */}
-              <div>
-                <label className="block text-sm font-medium text-stone-700 mb-2">
-                  日期
-                </label>
+              <div className="bg-white p-4 rounded-2xl shadow-sm border border-[#F5F5F5]">
                 <input
                   type="date"
                   value={targetDate}
                   onChange={(e) => setTargetDate(e.target.value)}
-                  className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent"
+                  className="w-full bg-transparent text-[#333] font-medium outline-none"
                   required
                 />
               </div>
 
-              {/* 农历/阳历切换 */}
-              <div className="flex items-center justify-between p-4 bg-amber-50 rounded-2xl">
-                <div className="flex items-center gap-2">
-                  {isLunar ? <Moon size={18} className="text-amber-600" /> : <Sun size={18} className="text-amber-600" />}
-                  <span className="text-sm font-medium text-stone-700">
-                    {isLunar ? '农历日期' : '阳历日期'}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsLunar(!isLunar)}
-                  className={`relative w-12 h-6 rounded-full transition-colors ${
-                    isLunar ? 'bg-amber-400' : 'bg-stone-300'
-                  }`}
-                >
-                  <motion.div
-                    layout
-                    className="absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm"
-                    animate={{ left: isLunar ? '28px' : '4px' }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  />
-                </button>
-              </div>
-
-              {/* 类型选择 */}
               <div>
-                <label className="block text-sm font-medium text-stone-700 mb-2">
-                  纪念日类型
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setType('countdown')}
-                    className={`p-3 rounded-2xl border-2 transition-all ${
-                      type === 'countdown'
-                        ? 'border-rose-400 bg-rose-50 text-rose-600'
-                        : 'border-stone-200 bg-white text-stone-600'
-                    }`}
-                  >
-                    <Calendar size={20} className="mx-auto mb-1" />
-                    <span className="text-sm font-medium">倒计时</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setType('countup')}
-                    className={`p-3 rounded-2xl border-2 transition-all ${
-                      type === 'countup'
-                        ? 'border-rose-400 bg-rose-50 text-rose-600'
-                        : 'border-stone-200 bg-white text-stone-600'
-                    }`}
-                  >
-                    <Repeat size={20} className="mx-auto mb-1" />
-                    <span className="text-sm font-medium">正计时</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* 重复类型 */}
-              <div>
-                <label className="block text-sm font-medium text-stone-700 mb-2">
-                  重复频率
-                </label>
-                <div className="grid grid-cols-3 gap-3">
-                  {(['yearly', 'monthly', 'once'] as const).map((rt) => (
+                <label className="block text-sm font-medium text-[#666] mb-3 ml-1">重复方式</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {repeatOptions.map((option) => (
                     <button
-                      key={rt}
+                      key={option.value}
                       type="button"
-                      onClick={() => setRepeatType(rt)}
-                      className={`py-2 px-3 rounded-xl text-sm font-medium transition-all ${
-                        repeatType === rt
-                          ? 'bg-rose-400 text-white'
-                          : 'bg-stone-100 text-stone-600'
-                      }`}
+                      onClick={() => setRepeatType(option.value)}
+                      className={cn(
+                        'inline-flex items-center justify-center gap-1.5 rounded-2xl border px-3 py-3 text-sm font-bold transition',
+                        repeatType === option.value
+                          ? 'border-[#FFB199] bg-[#FFF0E5] text-[#FF7A59]'
+                          : 'border-[#F5F5F5] bg-white text-[#8A817A]',
+                      )}
                     >
-                      {rt === 'yearly' ? '每年' : rt === 'monthly' ? '每月' : '仅一次'}
+                      <Repeat size={14} />
+                      {option.label}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* 图标选择 */}
+              <button
+                type="button"
+                onClick={() => setIsLunar((value) => !value)}
+                className={cn(
+                  'flex w-full items-center justify-between rounded-2xl border p-4 text-sm font-bold transition',
+                  isLunar ? 'border-[#FFB199] bg-[#FFF0E5] text-[#FF7A59]' : 'border-[#F5F5F5] bg-white text-[#8A817A]',
+                )}
+              >
+                <span className="inline-flex items-center gap-2">
+                  <Moon size={16} />
+                  按农历日期提醒
+                </span>
+                <span className="text-xs">{isLunar ? '已开启' : '未开启'}</span>
+              </button>
+
               <div>
-                <label className="block text-sm font-medium text-stone-700 mb-2">
-                  选择图标
-                </label>
-                <div className="grid grid-cols-5 gap-2">
+                <label className="block text-sm font-medium text-[#666] mb-3 ml-1">选择专属图标</label>
+                <div className="flex justify-between">
                   {ICONS.map((ic) => (
                     <button
                       key={ic}
                       type="button"
                       onClick={() => setIcon(ic)}
-                      className={`p-3 rounded-xl text-2xl transition-all ${
-                        icon === ic
-                          ? 'bg-rose-100 ring-2 ring-rose-400'
-                          : 'bg-stone-50 hover:bg-stone-100'
-                      }`}
+                      className={cn(
+                        'text-2xl p-2 rounded-xl transition',
+                        icon === ic ? 'bg-[#FFF0E5] scale-110' : 'grayscale-[50%] opacity-60',
+                      )}
                     >
                       {ic}
                     </button>
@@ -208,26 +186,13 @@ export function AnniversaryFormModal({ isOpen, onClose, onSubmit, initialData }:
                 </div>
               </div>
 
-              {/* 描述（可选） */}
-              <div>
-                <label className="block text-sm font-medium text-stone-700 mb-2">
-                  备注（可选）
-                </label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="添加一些特别的回忆..."
-                  rows={3}
-                  className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent resize-none"
-                />
-              </div>
-
-              {/* 提交按钮 */}
               <button
                 type="submit"
-                className="w-full py-4 bg-gradient-to-r from-rose-400 to-pink-400 text-white font-bold rounded-2xl hover:from-rose-500 hover:to-pink-500 transition-all shadow-lg shadow-rose-200"
+                disabled={!title.trim() || !targetDate || submitting}
+                className="w-full mt-8 py-4 bg-[#FF7A59] text-white font-bold rounded-2xl shadow-[0_4px_15px_rgba(255,122,89,0.3)] active:scale-95 transition-transform disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-2"
               >
-                {initialData ? '保存修改' : '添加纪念日'}
+                {submitting && <Loader2 size={18} className="animate-spin" />}
+                {submitting ? '保存中...' : isEditMode ? '保存修改' : '确认添加'}
               </button>
             </form>
           </motion.div>

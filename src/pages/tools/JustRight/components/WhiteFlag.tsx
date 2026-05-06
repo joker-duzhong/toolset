@@ -1,109 +1,58 @@
-// 白旗求和按钮组件
-import { useState } from 'react'
-import { Flag } from 'lucide-react'
-
-interface WhiteFlagButtonProps {
-  raised: boolean
-  onRaise: () => void
-  onLower: () => void
-}
-
-export function WhiteFlagButton({ raised, onRaise, onLower }: WhiteFlagButtonProps) {
-  const [showConfirm, setShowConfirm] = useState(false)
-
-  if (raised) {
-    return (
-      <button
-        onClick={onLower}
-        className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-md border border-stone-200 text-stone-600 hover:bg-stone-50 transition-colors"
-      >
-        <Flag size={18} className="text-stone-400" />
-        <span className="text-sm">收起白旗</span>
-      </button>
-    )
-  }
-
-  return (
-    <div className="relative z-20">
-      <button
-        onClick={() => setShowConfirm(true)}
-        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-stone-100 to-stone-200 rounded-full shadow-md text-stone-600 hover:from-stone-200 hover:to-stone-300 transition-all"
-      >
-        <Flag size={18} />
-        <span className="text-sm">举白旗</span>
-      </button>
-
-      {/* 确认弹窗 */}
-      {showConfirm && (
-        <div className="fixed bottom-auto right-auto bg-white rounded-2xl p-4 shadow-lg border border-stone-100 w-48 z-50" style={{
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)'
-        }}>
-          <p className="text-sm text-stone-600 mb-3 text-center">
-            🏳️ 确认举白旗求和？
-          </p>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setShowConfirm(false)}
-              className="flex-1 px-3 py-2 text-sm text-stone-500 bg-stone-100 rounded-xl"
-            >
-              取消
-            </button>
-            <button
-              onClick={() => {
-                onRaise()
-                setShowConfirm(false)
-              }}
-              className="flex-1 px-3 py-2 text-sm text-white bg-amber-500 rounded-xl"
-            >
-              确认
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-// 白旗动画 - 对方收到白旗时展示
+// 求原谅动画 - 对方心情为“求原谅”时展示
 export function WhiteFlagAnimation({ onClose }: { onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-      <div className="bg-white rounded-3xl p-8 max-w-sm mx-4 text-center animate-bounce-in">
-        {/* 小狗送花动画 - 使用 emoji 代替 */}
-        <div className="text-6xl mb-4 animate-float">🐕💐</div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/40 backdrop-blur-sm">
+      <div className="bg-[#FFFDF7] rounded-[2rem] p-8 max-w-sm mx-4 w-full text-center shadow-2xl relative overflow-hidden animate-spring-up">
+        
+        {/* 背景光晕装饰 */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 bg-[#FA705A] opacity-10 blur-3xl rounded-full" />
 
-        <h2 className="text-xl font-bold text-stone-800 mb-2">
-          Ta 举白旗啦！
+        {/* 纯 SVG 手绘求和动画图形 */}
+        <div className="flex justify-center mb-6">
+          <div className="relative w-32 h-32 flex items-center justify-center animate-wiggle">
+            <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* 爱心气泡 */}
+              <path d="M90 30 C 90 20, 110 20, 110 30 C 110 40, 90 50, 90 50 C 90 50, 70 40, 70 30 C 70 20, 90 20, 90 30" fill="#FFB4A9" className="animate-pulse" />
+              {/* 小手递出求和信号 */}
+              <path d="M20 100 Q 40 80, 60 90" stroke="#E6C3B3" strokeWidth="12" strokeLinecap="round" />
+              <path d="M55 90V40" stroke="#B8A89F" strokeWidth="4" strokeLinecap="round" />
+              {/* 飘动的旗帜 */}
+              <path d="M55 45 C 70 35, 80 55, 95 45 V 75 C 80 85, 70 65, 55 75 Z" fill="#FFFFFF" stroke="#F2EAE4" strokeWidth="2" />
+            </svg>
+          </div>
+        </div>
+
+        <h2 className="text-2xl font-black text-stone-800 mb-2">
+          Ta 正在求原谅
         </h2>
-        <p className="text-stone-500 mb-6">
-          原谅 Ta 了吧～
+        <p className="text-sm text-stone-500 mb-8 font-medium">
+          爱情里没有输赢，<br/>Ta 只是不想失去你。
         </p>
 
         <button
           onClick={onClose}
-          className="px-8 py-3 bg-gradient-to-r from-amber-400 to-orange-400 text-white rounded-full font-medium shadow-md hover:shadow-lg transition-shadow"
+          className="w-full py-4 bg-stone-800 text-white rounded-2xl font-bold text-sm shadow-xl hover:bg-stone-700 transition-colors active:scale-95"
         >
-          接受求和 🤝
+          收到，给个台阶下
         </button>
       </div>
 
+      {/* 自定义 CSS 动画注入 */}
       <style>{`
-        @keyframes bounce-in {
-          0% { transform: scale(0.5); opacity: 0; }
-          50% { transform: scale(1.05); }
-          100% { transform: scale(1); opacity: 1; }
+        @keyframes spring-up {
+          0% { transform: scale(0.9) translateY(20px); opacity: 0; }
+          60% { transform: scale(1.02) translateY(-5px); opacity: 1; }
+          100% { transform: scale(1) translateY(0); opacity: 1; }
         }
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
+        @keyframes wiggle {
+          0%, 100% { transform: rotate(-3deg); }
+          50% { transform: rotate(3deg); }
         }
-        .animate-bounce-in {
-          animation: bounce-in 0.5s ease-out;
+        .animate-spring-up {
+          animation: spring-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-        .animate-float {
-          animation: float 2s ease-in-out infinite;
+        .animate-wiggle {
+          animation: wiggle 3s ease-in-out infinite;
         }
       `}</style>
     </div>

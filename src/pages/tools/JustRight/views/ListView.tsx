@@ -13,7 +13,7 @@ interface ListViewProps {
   onToggleTodo: (id: string, status: "pending" | "completed") => void;
   onDeleteTodo: (id: string) => void;
   onAddMemo: (content: string, imageIds: string[]) => void;
-  onDeleteMemo: (id: number) => void;
+  onDeleteMemo: (id: string) => void;
 }
 
 interface TodoSectionProps {
@@ -27,7 +27,7 @@ interface TodoSectionProps {
 interface MemoSectionProps {
   memos: Memo[];
   onAdd: () => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
 }
 
 // ================= 主视图组件 =================

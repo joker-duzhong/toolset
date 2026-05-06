@@ -6,7 +6,7 @@
 
 import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, ImagePlus, FolderOpen } from 'lucide-react'
+import { Plus, FolderOpen } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { useFeed } from './hooks/useFeed'
 import { useGenerateEngine } from './hooks/useGenerateEngine'

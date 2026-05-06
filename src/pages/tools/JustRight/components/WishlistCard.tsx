@@ -1,15 +1,18 @@
-import { useState } from "react";
-import { Link2, Copy, Gift, Check, Plus, Sparkles, Heart } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Link2, Copy, Gift, Check, Plus, Sparkles, Heart, X, Image as ImageIcon, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { WishlistItem } from "../types";
+import type { WishlistFulfillPayload, WishlistItem, WishlistItemPayload } from "../types";
 import { cn } from "@/utils/cn";
+import { storageApi } from "@/common/api/storage";
+import { APP_KEY as JUST_RIGHT_APP_KEY } from "../services/api";
+import toast from "react-hot-toast";
 
 interface WishlistCardProps {
   item: WishlistItem;
   isMine: boolean;
-  onClaim: (id: number) => void;
-  onFulfill: (id: number) => void;
-  onDelete: (id: number) => void;
+  onClaim: (id: string) => void;
+  onFulfill: (id: string) => void;
+  onDelete: (id: string) => void;
 }
 
 export function WishlistCard({ item, isMine, onClaim, onFulfill, onDelete }: WishlistCardProps) {
@@ -206,26 +209,66 @@ export function WishlistCard({ item, isMine, onClaim, onFulfill, onDelete }: Wis
 // ================= 心愿添加弹窗 =================
 interface WishlistAddModalProps {
   open: boolean;
+  mode?: "create" | "edit";
+  initialValue?: WishlistItem | null;
   onClose: () => void;
-  onSubmit: (item: { title: string; url?: string; price?: number; image_url?: string }) => void;
+  onSubmit: (item: WishlistItemPayload) => Promise<void> | void;
 }
 
-export function WishlistAddModal({ open, onClose, onSubmit }: WishlistAddModalProps) {
+export function WishlistAddModal({ open, mode = "create", initialValue, onClose, onSubmit }: WishlistAddModalProps) {
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
   const [price, setPrice] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const isEditMode = mode === "edit";
 
-  const handleSubmit = () => {
-    if (title.trim()) {
-      onSubmit({
-        title: title.trim(),
-        url: url.trim() || undefined,
-        price: price ? parseFloat(price) : undefined,
+  useEffect(() => {
+    if (!open) return;
+
+    setTitle(initialValue?.title || "");
+    setUrl(initialValue?.url || "");
+    setPrice(initialValue?.price != null ? String(initialValue.price) : "");
+    setImageUrl(initialValue?.image_url || "");
+  }, [initialValue, open]);
+
+  const resetForm = () => {
+    setTitle("");
+    setUrl("");
+    setPrice("");
+    setImageUrl("");
+  };
+
+  const handleClose = () => {
+    if (submitting) return;
+    resetForm();
+    onClose();
+  };
+
+  const handleSubmit = async () => {
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) return;
+
+    const normalizedPrice = price.trim() ? Number(price) : null;
+    if (normalizedPrice != null && (Number.isNaN(normalizedPrice) || normalizedPrice < 0)) {
+      toast.error("请输入有效的价格");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      await onSubmit({
+        title: trimmedTitle,
+        url: url.trim() || null,
+        price: normalizedPrice,
+        image_url: imageUrl.trim() || null,
       });
-      setTitle("");
-      setUrl("");
-      setPrice("");
+      resetForm();
       onClose();
+    } catch {
+      toast.error(isEditMode ? "保存心愿失败" : "添加心愿失败");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -238,7 +281,7 @@ export function WishlistAddModal({ open, onClose, onSubmit }: WishlistAddModalPr
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={handleClose}
             className="fixed inset-0 z-[60] bg-stone-900/20 backdrop-blur-sm"
           />
 
@@ -258,7 +301,7 @@ export function WishlistAddModal({ open, onClose, onSubmit }: WishlistAddModalPr
                 size={20}
                 className="text-rose-400 fill-rose-100"
               />
-              <h3 className="text-lg font-bold text-stone-800">许下新的心愿</h3>
+              <h3 className="text-lg font-bold text-stone-800">{isEditMode ? "编辑心愿" : "许下新的心愿"}</h3>
             </div>
 
             <div className="space-y-4">
@@ -286,16 +329,241 @@ export function WishlistAddModal({ open, onClose, onSubmit }: WishlistAddModalPr
                   className="w-full px-5 py-4 bg-[#FDFBF7] rounded-2xl border border-stone-100 text-stone-700 placeholder:text-stone-400 text-sm focus:border-rose-300 focus:bg-white focus:outline-none transition-all"
                 />
               </div>
+
+              <input
+                type="url"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="图片链接 (选填)"
+                className="w-full px-5 py-4 bg-[#FDFBF7] rounded-2xl border border-stone-100 text-stone-700 placeholder:text-stone-400 text-sm focus:border-rose-300 focus:bg-white focus:outline-none transition-all"
+              />
             </div>
 
             <motion.button
               whileTap={{ scale: title.trim() ? 0.98 : 1 }}
               onClick={handleSubmit}
-              disabled={!title.trim()}
+              disabled={!title.trim() || submitting}
               className="w-full mt-8 py-4 bg-[#1C1C1E] text-white rounded-2xl font-bold text-base shadow-lg shadow-stone-200/50 disabled:opacity-40 disabled:shadow-none transition-all flex items-center justify-center gap-2"
             >
-              放入心愿单 <Gift size={18} />
+              {submitting ? (
+                <>
+                  <Loader2
+                    size={18}
+                    className="animate-spin"
+                  />
+                  {isEditMode ? "保存中..." : "放入中..."}
+                </>
+              ) : (
+                <>
+                  {isEditMode ? "保存心愿" : "放入心愿单"} <Gift size={18} />
+                </>
+              )}
             </motion.button>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+
+interface WishlistFulfillRecordModalProps {
+  open: boolean;
+  onClose: () => void;
+  onSubmit: (payload: WishlistFulfillPayload) => Promise<void> | void;
+}
+
+export function WishlistFulfillRecordModal({ open, onClose, onSubmit }: WishlistFulfillRecordModalProps) {
+  const [note, setNote] = useState("");
+  const [images, setImages] = useState<{ file: File; preview: string }[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const reset = () => {
+    images.forEach(({ preview }) => URL.revokeObjectURL(preview));
+    setNote("");
+    setImages([]);
+  };
+
+  const handleClose = () => {
+    if (submitting) return;
+    reset();
+    onClose();
+  };
+
+  const handleSelectImages = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    if (images.length + files.length > 9) {
+      toast.error("最多只能上传 9 张图片");
+      return;
+    }
+
+    setImages((prev) => [
+      ...prev,
+      ...files.map((file) => ({
+        file,
+        preview: URL.createObjectURL(file),
+      })),
+    ]);
+    event.target.value = "";
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setImages((prev) => {
+      const next = [...prev];
+      URL.revokeObjectURL(next[index].preview);
+      next.splice(index, 1);
+      return next;
+    });
+  };
+
+  const uploadImages = async () => {
+    const uploaded = await storageApi.uploadFiles(
+      images.map(({ file }) => file),
+      {
+        appKey: JUST_RIGHT_APP_KEY,
+        compression: {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1920,
+          fileType: "image/jpeg",
+        },
+        thumbnail: {
+          maxWidthOrHeight: 512,
+          fileType: "image/jpeg",
+        },
+      },
+    );
+    return uploaded.map((item) => item.resource.id);
+  };
+
+  const handleSubmit = async () => {
+    if (!note.trim() && images.length === 0) {
+      toast.error("请填写记录或上传图片");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const resourceIds = images.length > 0 ? await uploadImages() : [];
+      await onSubmit({
+        note: note.trim() || null,
+        resource_ids: resourceIds.length ? resourceIds : null,
+      });
+      reset();
+      onClose();
+    } catch {
+      toast.error("保存完成记录失败");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={handleClose}
+            className="fixed inset-0 z-[60] bg-stone-900/20 backdrop-blur-sm"
+          />
+
+          <motion.div
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed bottom-0 left-0 right-0 z-[70] max-h-[90vh] overflow-y-auto rounded-t-[2.5rem] bg-white px-6 pb-10 pt-4 shadow-2xl"
+          >
+            <div className="mx-auto mb-6 h-1.5 w-12 rounded-full bg-stone-200" />
+
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-stone-800">记录这次实现</h3>
+                <p className="mt-1 text-xs text-stone-400">备注和照片会随完成动作一起提交</p>
+              </div>
+              <button
+                onClick={handleClose}
+                disabled={submitting}
+                className="rounded-full bg-stone-100 p-2 text-stone-400 disabled:opacity-50"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <textarea
+              value={note}
+              onChange={(event) => setNote(event.target.value)}
+              placeholder="写一点准备过程或完成备注..."
+              rows={4}
+              disabled={submitting}
+              className="mb-4 w-full resize-none rounded-2xl border border-stone-100 bg-[#FDFBF7] px-5 py-4 text-sm text-stone-700 placeholder:text-stone-400 focus:border-rose-300 focus:bg-white focus:outline-none disabled:opacity-50"
+            />
+
+            {images.length > 0 && (
+              <div className="mb-4 grid grid-cols-3 gap-2">
+                {images.map(({ preview }, index) => (
+                  <div
+                    key={preview}
+                    className="relative aspect-square overflow-hidden rounded-xl bg-stone-100"
+                  >
+                    <img
+                      src={preview}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                    <button
+                      onClick={() => handleRemoveImage(index)}
+                      disabled={submitting}
+                      className="absolute right-1.5 top-1.5 rounded-full bg-black/40 p-1 text-white backdrop-blur disabled:opacity-50"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={submitting || images.length >= 9}
+                className="flex-1 rounded-2xl bg-stone-100 px-4 py-3.5 text-sm font-bold text-stone-600 disabled:opacity-50"
+              >
+                <span className="inline-flex items-center gap-2">
+                  <ImageIcon size={16} />
+                  图片 ({images.length}/9)
+                </span>
+              </button>
+
+              <button
+                onClick={handleSubmit}
+                disabled={submitting || (!note.trim() && images.length === 0)}
+                className="flex-1 rounded-2xl bg-emerald-500 px-4 py-3.5 text-sm font-bold text-white shadow-md shadow-emerald-100 disabled:opacity-50"
+              >
+                {submitting ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Loader2
+                      size={16}
+                      className="animate-spin"
+                    />
+                    提交中...
+                  </span>
+                ) : (
+                  "完成并记录"
+                )}
+              </button>
+            </div>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleSelectImages}
+              className="hidden"
+            />
           </motion.div>
         </>
       )}

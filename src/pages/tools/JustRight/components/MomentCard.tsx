@@ -1,52 +1,38 @@
-// 时刻卡片组件
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Heart, MessageCircle, Trash2, MoreVertical } from 'lucide-react'
-import type { Memo } from '../types'
-import { cn } from '@/utils/cn'
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Heart, MessageSquare, Pin } from "lucide-react";
+import type { MomentViewData } from "../types";
+import { cn } from "@/utils/cn";
+import { MomentMediaGrid } from "./MomentMediaGrid";
+import { formatMomentTime } from "../utils/moments";
 
 interface MomentCardProps {
-  moment: Memo
-  currentUserId: number
-  onDelete: (id: number) => void
-  onLike: (id: number) => void
-  onUnlike: (id: number) => void
+  moment: MomentViewData;
+  currentUserId: string;
+  onOpenDetail: (id: string) => void;
+  onToggleLike: (id: string) => void;
 }
 
-export function MomentCard({ moment, currentUserId, onDelete, onLike, onUnlike }: MomentCardProps) {
-  const [showMenu, setShowMenu] = useState(false)
-  const [showLikeAnimation, setShowLikeAnimation] = useState(false)
+export function MomentCard({ moment, currentUserId, onOpenDetail, onToggleLike }: MomentCardProps) {
+  const [showLikeAnimation, setShowLikeAnimation] = useState(false);
 
-  const isMyMoment = moment.creator_uid === currentUserId
-  const isLiked = moment.liked_by_me || false
-  const likeCount = moment.likes || 0
-  const images = moment.resources || []
+  const isMyMoment = moment.creator_uid === currentUserId;
+  const isLiked = moment.liked_by_me;
+  const likeCount = moment.likes_count || 0;
+  const images = moment.resources || [];
+  const commentCount = moment.comments_count || 0;
 
-  // 双击点赞
   const handleDoubleTap = () => {
     if (!isLiked) {
-      onLike(moment.id)
-      setShowLikeAnimation(true)
-      setTimeout(() => setShowLikeAnimation(false), 1000)
+      onToggleLike(moment.id);
+      setShowLikeAnimation(true);
+      setTimeout(() => setShowLikeAnimation(false), 1000);
     }
-  }
+  };
 
-  // 点赞按钮
   const handleLikeClick = () => {
-    if (isLiked) {
-      onUnlike(moment.id)
-    } else {
-      onLike(moment.id)
-    }
-  }
-
-  // 删除确认
-  const handleDelete = () => {
-    if (confirm('确定删除这条时刻吗？')) {
-      onDelete(moment.id)
-    }
-    setShowMenu(false)
-  }
+    onToggleLike(moment.id);
+  };
 
   return (
     <motion.div
@@ -54,103 +40,42 @@ export function MomentCard({ moment, currentUserId, onDelete, onLike, onUnlike }
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="bg-white rounded-3xl p-4 shadow-sm border border-stone-100"
+      onClick={() => onOpenDetail(moment.id)}
+      className="bg-white rounded-[28px] p-5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)]"
     >
-      {/* 头部：头像、昵称、时间 */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-3.5">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-200 to-amber-200 flex items-center justify-center text-lg">
-            {isMyMoment ? '🙋‍♀️' : '💁‍♂️'}
-          </div>
-          <div>
-            <p className="text-sm font-bold text-stone-700">
-              {isMyMoment ? '我' : 'Ta'}
-            </p>
-            <p className="text-xs text-stone-400">
-              {new Date(moment.created_at).toLocaleDateString('zh-CN', {
-                month: 'numeric',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </p>
+          <div className="w-11 h-11 rounded-full bg-gradient-to-br from-orange-100 to-amber-50 flex items-center justify-center text-[22px] overflow-hidden">{isMyMoment ? "👧" : "🧑"}</div>
+          <div className="flex flex-col justify-center">
+            <div className="flex items-center gap-2">
+              <p className="text-[16px] font-bold text-[#333333] leading-tight">{isMyMoment ? "我" : "Ta"}</p>
+              {moment.is_pinned && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF3EE] px-2 py-0.5 text-[11px] font-medium text-[#FF8D6B]">
+                  <Pin size={11} />
+                  置顶
+                </span>
+              )}
+            </div>
+            <p className="mt-0.5 text-[13px] text-[#999999]">{formatMomentTime(moment.created_at)}</p>
           </div>
         </div>
-
-        {/* 菜单按钮（仅自己的时刻） */}
-        {isMyMoment && (
-          <div className="relative">
-            <button
-              onClick={() => setShowMenu(!showMenu)}
-              className="p-2 text-stone-400 hover:bg-stone-50 rounded-lg transition-colors"
-            >
-              <MoreVertical size={16} />
-            </button>
-
-            <AnimatePresence>
-              {showMenu && (
-                <>
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    onClick={() => setShowMenu(false)}
-                    className="fixed inset-0 z-10"
-                  />
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                    className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-lg border border-stone-100 overflow-hidden z-20"
-                  >
-                    <button
-                      onClick={handleDelete}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors w-full"
-                    >
-                      <Trash2 size={14} />
-                      删除
-                    </button>
-                  </motion.div>
-                </>
-              )}
-            </AnimatePresence>
-          </div>
-        )}
       </div>
 
-      {/* 图片区域 */}
-      {images.length > 0 && (
-        <div className="relative mb-3" onDoubleClick={handleDoubleTap}>
-          {/* 图片网格 */}
-          <div
-            className={cn(
-              'grid gap-2 rounded-2xl overflow-hidden',
-              images.length === 1 && 'grid-cols-1',
-              images.length === 2 && 'grid-cols-2',
-              images.length === 3 && 'grid-cols-3',
-              images.length === 4 && 'grid-cols-2',
-              images.length >= 5 && 'grid-cols-3'
-            )}
-          >
-            {images.slice(0, 9).map((img, idx) => (
-              <div
-                key={idx}
-                className={cn(
-                  'relative bg-stone-100 overflow-hidden',
-                  images.length === 1 ? 'aspect-[4/3]' : 'aspect-square'
-                )}
-              >
-                <img
-                  src={img.thumb_url || img.url}
-                  alt=""
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
-              </div>
-            ))}
-          </div>
+      {moment.content && (
+        <button
+          type="button"
+          className="mb-3.5 block w-full text-left"
+        >
+          <p className="line-clamp-4 whitespace-pre-wrap text-[15px] leading-[1.6] tracking-wide text-[#333333]">{moment.content}</p>
+        </button>
+      )}
 
-          {/* 双击点赞动画 */}
+      {images.length > 0 && (
+        <div
+          className="relative mb-4"
+          onDoubleClick={handleDoubleTap}
+        >
+          <MomentMediaGrid images={images} />
           <AnimatePresence>
             {showLikeAnimation && (
               <motion.div
@@ -160,44 +85,44 @@ export function MomentCard({ moment, currentUserId, onDelete, onLike, onUnlike }
                 transition={{ duration: 0.6 }}
                 className="absolute inset-0 flex items-center justify-center pointer-events-none"
               >
-                <Heart size={80} className="text-rose-500 fill-rose-500" />
+                <Heart
+                  size={80}
+                  className="text-[#FF9874] fill-[#FF9874]"
+                />
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       )}
 
-      {/* 文字内容 */}
-      {moment.content && (
-        <p className="text-sm text-stone-700 leading-relaxed mb-3 whitespace-pre-wrap">
-          {moment.content}
-        </p>
-      )}
-
-      {/* 交互区：点赞、评论 */}
-      <div className="flex items-center gap-4 pt-3 border-t border-stone-100">
+      <div className="flex justify-between items-center mt-2">
         <motion.button
           whileTap={{ scale: 0.9 }}
           onClick={handleLikeClick}
-          className="flex items-center gap-1.5 text-stone-500 hover:text-rose-500 transition-colors"
+          className="flex items-center gap-1.5 text-[#CCCCCC] hover:text-[#FF9874] transition-colors"
         >
           <Heart
-            size={18}
-            className={cn(
-              'transition-all',
-              isLiked && 'text-rose-500 fill-rose-500'
-            )}
+            size={20}
+            strokeWidth={2}
+            className={cn("transition-all", isLiked && "text-[#FF9874] fill-[#FF9874]")}
           />
-          <span className="text-xs font-medium">
-            {likeCount > 0 ? likeCount : '点赞'}
-          </span>
+          <span className={cn("text-[14px] font-medium", isLiked ? "text-[#FF9874]" : "")}>{likeCount > 0 ? likeCount : ""}</span>
         </motion.button>
 
-        <button className="flex items-center gap-1.5 text-stone-500 hover:text-amber-500 transition-colors">
-          <MessageCircle size={18} />
-          <span className="text-xs font-medium">评论</span>
-        </button>
+        <div className="flex items-center gap-4 text-[#CCCCCC]">
+          <button
+            type="button"
+            onClick={() => onOpenDetail(moment.id)}
+            className="flex items-center gap-1.5 hover:text-gray-500 transition-colors"
+          >
+            <MessageSquare
+              size={19}
+              strokeWidth={2}
+            />
+            <span className="text-[14px] font-medium">{commentCount > 0 ? commentCount : ""}</span>
+          </button>
+        </div>
       </div>
     </motion.div>
-  )
+  );
 }

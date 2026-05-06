@@ -4,18 +4,18 @@ import { cn } from "@/utils/cn";
 import { Gift, Dices, Lightbulb, Sparkles } from "lucide-react";
 import { WishlistCard, WishlistAddModal, FloatingAddButton } from "../components/WishlistCard";
 import { RouletteWheel, RouletteOptions, CategorySelector } from "../components/RouletteWheel";
-import type { WishlistItem, RouletteOption } from "../types";
+import type { WishlistFulfillPayload, WishlistItem, WishlistItemPayload, RouletteOption } from "../types";
 
 type SubTab = "wish" | "roulette";
 
 interface WishViewProps {
   wishlist: WishlistItem[];
   rouletteOptions: RouletteOption[];
-  currentUserId: number;
-  onAddWish: (item: { title: string; url?: string; price?: number; image_url?: string; description?: string }) => void;
-  onClaimWish: (id: number) => void;
-  onFulfillWish: (id: number) => void;
-  onDeleteWish: (id: number) => void;
+  currentUserId: string;
+  onAddWish: (item: WishlistItemPayload) => void;
+  onClaimWish: (id: string) => void;
+  onFulfillWish: (id: string, payload?: WishlistFulfillPayload) => void;
+  onDeleteWish: (id: string) => void;
   onAddRouletteOption: (title: string, category: "food" | "place" | "other") => void;
   onDeleteRouletteOption: (id: number) => void;
 }
@@ -156,10 +156,10 @@ export function WishView({ wishlist, rouletteOptions, currentUserId, onAddWish, 
 // ================= 心愿单部分 =================
 interface WishSectionProps {
   wishes: WishlistItem[];
-  currentUserId: number;
-  onClaim: (id: number) => void;
-  onFulfill: (id: number) => void;
-  onDelete: (id: number) => void;
+  currentUserId: string;
+  onClaim: (id: string) => void;
+  onFulfill: (id: string) => void;
+  onDelete: (id: string) => void;
 }
 
 function WishSection({ wishes, currentUserId, onClaim, onFulfill, onDelete }: WishSectionProps) {

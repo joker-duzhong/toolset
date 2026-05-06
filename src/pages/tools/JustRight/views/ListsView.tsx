@@ -1,25 +1,25 @@
-// 清单视图 - 整合待办和心愿单
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ListChecks, Gift } from 'lucide-react'
 import { SegmentedControl } from '../components/SegmentedControl'
 import { TodoSection } from '../components/TodoSection'
 import { WishlistSection } from '../components/WishlistSection'
-import type { TodoItem, WishlistItem } from '../types'
+import type { TodoItem, WishlistFulfillPayload, WishlistItem, WishlistItemPayload, WishlistItemUpdatePayload } from '../types'
 
 type ListTab = 'todo' | 'wish'
 
 interface ListsViewProps {
   todos: TodoItem[]
   wishlist: WishlistItem[]
-  currentUserId: number
+  currentUserId: string
   onAddTodo: (content: string) => void
   onToggleTodo: (id: string, status: 'pending' | 'completed') => void
   onDeleteTodo: (id: string) => void
-  onAddWish: (item: { title: string; url?: string; price?: number; image_url?: string; description?: string }) => void
-  onClaimWish: (id: number) => void
-  onFulfillWish: (id: number) => void
-  onDeleteWish: (id: number) => void
+  onAddWish: (item: WishlistItemPayload) => Promise<void> | void
+  onUpdateWish: (id: string, item: WishlistItemUpdatePayload) => Promise<void> | void
+  onClaimWish: (id: string) => Promise<void> | void
+  onUnclaimWish: (id: string) => Promise<void> | void
+  onFulfillWish: (id: string, payload?: WishlistFulfillPayload) => Promise<void> | void
+  onDeleteWish: (id: string) => Promise<void> | void
 }
 
 export function ListsView({
@@ -30,49 +30,45 @@ export function ListsView({
   onToggleTodo,
   onDeleteTodo,
   onAddWish,
+  onUpdateWish,
   onClaimWish,
+  onUnclaimWish,
   onFulfillWish,
   onDeleteWish,
 }: ListsViewProps) {
   const [activeTab, setActiveTab] = useState<ListTab>('todo')
 
   return (
-    <div className="min-h-full bg-[#FDFBF7] pb-24">
+    <div className="min-h-full bg-[#FFFDFB] pb-24">
       {/* 顶部导航栏 */}
-      <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-stone-100">
-        <div className="px-4 py-4">
-          <h1 className="font-bold text-stone-800 mb-4">清单</h1>
+      <div className="sticky top-0 z-10 bg-[#FFFDFB]/90 backdrop-blur-md pb-4 pt-8">
+        <div className="px-6 flex flex-col items-center">
+          <h1 className="font-bold text-[#4A4036] text-lg mb-6">清单</h1>
 
-          {/* 分段控制器 */}
-          <SegmentedControl
-            options={[
-              {
-                value: 'todo' as ListTab,
-                label: '日常待办',
-                icon: <ListChecks size={18} />,
-              },
-              {
-                value: 'wish' as ListTab,
-                label: '惊喜心愿',
-                icon: <Gift size={18} />,
-              },
-            ]}
-            value={activeTab}
-            onChange={setActiveTab}
-          />
+          {/* 分段控制器 - 完全按照设计图还原 */}
+          <div className="w-full px-4">
+            <SegmentedControl
+              options={[
+                { value: 'todo', label: '日常待办' },
+                { value: 'wish', label: '惊喜心愿' },
+              ]}
+              value={activeTab}
+              onChange={setActiveTab}
+            />
+          </div>
         </div>
       </div>
 
       {/* 内容区 */}
-      <div className="px-4 pt-6">
+      <div className="px-6 pt-4">
         <AnimatePresence mode="wait">
           {activeTab === 'todo' ? (
             <motion.div
               key="todo"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.2 }}
             >
               <TodoSection
                 todos={todos}
@@ -84,16 +80,18 @@ export function ListsView({
           ) : (
             <motion.div
               key="wish"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+              transition={{ duration: 0.2 }}
             >
               <WishlistSection
                 wishlist={wishlist}
                 currentUserId={currentUserId}
                 onAdd={onAddWish}
+                onUpdate={onUpdateWish}
                 onClaim={onClaimWish}
+                onUnclaim={onUnclaimWish}
                 onFulfill={onFulfillWish}
                 onDelete={onDeleteWish}
               />

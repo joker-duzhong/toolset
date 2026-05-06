@@ -1,5 +1,3 @@
-// 纪念日卡片
-import { Heart, Cake, Sparkles } from 'lucide-react'
 import type { Anniversary } from '../types'
 
 interface AnniversaryCardProps {
@@ -39,13 +37,11 @@ export function AnniversaryCard({ anniversary }: AnniversaryCardProps) {
   const isCountUp = anniversary.type === 'countup'
   const days = isCountUp ? getDaysDiff(anniversary.target_date) : getDaysRemaining(anniversary.target_date)
 
-  const Icon = anniversary.title.includes('生日') ? Cake : anniversary.title.includes('纪念') ? Heart : Sparkles
-
   return (
     <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-3xl p-4 flex items-center gap-4 shadow-sm border border-rose-100/50">
       {/* 图标 */}
       <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-100 to-pink-200 flex items-center justify-center">
-        <Icon size={24} className="text-rose-500" />
+        <span className="text-2xl leading-none">{anniversary.icon || '✨'}</span>
       </div>
 
       {/* 内容 */}
@@ -74,13 +70,14 @@ interface CompactAnniversaryProps {
   title: string
   days: number
   type: 'countup' | 'countdown'
+  icon?: string | null
 }
 
-export function CompactAnniversary({ title, days, type }: CompactAnniversaryProps) {
+export function CompactAnniversary({ title, days, type, icon }: CompactAnniversaryProps) {
   return (
     <div className="flex items-center gap-2 bg-white/60 backdrop-blur-sm rounded-full px-4 py-2 shadow-sm">
       <span className="text-lg">
-        {title.includes('生日') ? '🎂' : title.includes('在一起') ? '💕' : '✨'}
+        {icon || '✨'}
       </span>
       <span className="text-sm text-stone-600">{title}</span>
       <span className="font-bold text-amber-600">

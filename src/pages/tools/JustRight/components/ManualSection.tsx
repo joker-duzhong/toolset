@@ -1,346 +1,379 @@
-import { useState } from 'react'
-import { motion, AnimatePresence, type Variants } from 'framer-motion'
-import { Edit2, Check, X, Ruler, Utensils, Heart } from 'lucide-react'
-import { cn } from '@/utils/cn'
-import type { UserManual, DietPreferences } from '../types'
+import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
+import type { DietPreferences, EmotionalGuide, ExtraInfo, UserManual } from '../types'
 
 interface ManualCardProps {
-  manual?: UserManual
-  isOwner?: boolean
-  onUpdate?: (data: Partial<UserManual>) => void
+  manual: UserManual
+  isOwner: boolean
+  onClose?: () => void
+  onUpdate: (data: Partial<UserManual>) => Promise<void> | void
 }
 
-// 修复点 4: 显式声明 Variants 类型，解决 TS 将 ease: "easeOut" 推断为普通 string 的问题
-const containerVariants: Variants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { staggerChildren: 0.1, duration: 0.4, ease: 'easeOut' },
-  },
+const Tabs = ['尺码档案', '饮食偏好', '情绪指南'] as const
+type TabType = typeof Tabs[number]
+type ManualStringField = 'shoe_size' | 'clothes_size' | 'pants_size' | 'ring_size'
+type ManualChange = <K extends keyof UserManual>(field: K, value: UserManual[K]) => void
+
+const toText = (value: unknown) => {
+  if (Array.isArray(value)) return value.filter((item): item is string => typeof item === 'string').join('，')
+  return typeof value === 'string' ? value : ''
 }
 
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { opacity: 1, y: 0 },
+const parseTags = (value: unknown) => {
+  if (!value) return []
+  if (Array.isArray(value)) return value.filter((item): item is string => typeof item === 'string' && Boolean(item.trim()))
+  if (typeof value === 'string') return value.split(/[,，\s]+/).filter(Boolean)
+  return []
 }
 
-// --- 尺码档案部分 ---
-function SizeSection({
-  manual = {} as UserManual,
-  editing,
-  onChange,
-}: {
-  manual?: UserManual
-  editing: boolean
-  onChange: (field: keyof UserManual, value: string) => void
-}) {
-  const fields = [
-    { key: 'shoe_size' as const, label: '鞋码', emoji: '👟' },
-    { key: 'clothes_size' as const, label: '衣服', emoji: '👕' },
-    { key: 'pants_size' as const, label: '裤子', emoji: '👖' },
-    { key: 'ring_size' as const, label: '戒指', emoji: '💍' },
-  ]
+const getExtraText = (data: Partial<UserManual>, key: keyof ExtraInfo, fallbackKey?: ManualStringField) => {
+  const extraValue = data.extra_info?.[key]
+  if (typeof extraValue === 'string' || Array.isArray(extraValue)) return toText(extraValue)
+  return fallbackKey ? toText(data[fallbackKey]) : ''
+}
+
+const buildManualPayload = (manual: Partial<UserManual>): Partial<UserManual> => ({
+  shoe_size: manual.shoe_size,
+  clothes_size: manual.clothes_size,
+  pants_size: manual.pants_size,
+  ring_size: manual.ring_size,
+  diet_preferences: manual.diet_preferences,
+  emotional_guide: manual.emotional_guide,
+  extra_info: manual.extra_info,
+})
+
+export function ManualCard({ manual, isOwner, onClose, onUpdate }: ManualCardProps) {
+  const [activeTab, setActiveTab] = useState<TabType>('尺码档案')
+  const [localManual, setLocalManual] = useState<Partial<UserManual>>(manual || {})
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saved' | 'error'>('idle')
+
+  useEffect(() => {
+    setLocalManual(manual || {})
+    setSaveStatus('idle')
+  }, [manual])
+
+  const handleChange: ManualChange = (field, value) => {
+    setLocalManual((prev) => ({ ...prev, [field]: value }))
+    setSaveStatus('idle')
+  }
+
+  const handleExtraInfoChange = (field: keyof ExtraInfo, value: string) => {
+    setLocalManual((prev) => ({
+      ...prev,
+      extra_info: {
+        ...(prev.extra_info || {}),
+        [field]: value,
+      },
+    }))
+    setSaveStatus('idle')
+  }
+
+  const handleSave = async () => {
+    if (!isOwner || isSaving) return
+
+    try {
+      setIsSaving(true)
+      setSaveStatus('idle')
+      await onUpdate(buildManualPayload(localManual))
+      setSaveStatus('saved')
+    } catch (error) {
+      console.error('Failed to save manual:', error)
+      setSaveStatus('error')
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   return (
-    <motion.div variants={itemVariants} className="bg-[#FFFAF3] rounded-3xl p-5 shadow-sm shadow-orange-900/5">
-      <div className="flex items-center gap-2 mb-4">
-        <div className="p-1.5 bg-orange-100 rounded-full text-orange-500">
-          <Ruler size={16} />
-        </div>
-        <h4 className="font-semibold text-stone-700 tracking-wide">尺码档案</h4>
+    <motion.div
+      initial={{ y: '100%' }}
+      animate={{ y: 0 }}
+      exit={{ y: '100%' }}
+      transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+      className="fixed inset-0 z-50 bg-[#FAFAFA] overflow-y-auto"
+    >
+      {/* 头部导航 */}
+      <div className="sticky top-0 bg-[#FAFAFA]/90 backdrop-blur-md z-10 px-4 pt-12 pb-4 flex items-center justify-between">
+        <button onClick={onClose} className="p-2 text-[#666]">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <h3 className="font-bold text-[#333] text-lg">
+          {isOwner ? '我的说明书' : 'Ta的说明书'}
+        </h3>
+        <div className="w-10" /> {/* 占位符保持居中 */}
       </div>
+
+      {/* Tabs */}
+      <div className="px-4 mb-6">
+        <div className="flex justify-between items-center px-2">
+          {Tabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`pb-2 text-sm transition-colors relative ${
+                activeTab === tab ? 'text-[#FF7A59] font-bold' : 'text-[#999] font-medium'
+              }`}
+            >
+              {tab}
+              {activeTab === tab && (
+                <motion.div layoutId="tabLine" className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-[#FF7A59] rounded-full" />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 内容区域 */}
+      <div className="px-5 pb-20">
+        {activeTab === '尺码档案' && (
+          <SizeTab data={localManual} isOwner={isOwner} onChange={handleChange} onExtraInfoChange={handleExtraInfoChange} />
+        )}
+        {activeTab === '饮食偏好' && (
+          <DietTab data={localManual} isOwner={isOwner} onChange={handleChange} />
+        )}
+        {activeTab === '情绪指南' && (
+          <EmotionalGuideTab data={localManual} isOwner={isOwner} onChange={handleChange} />
+        )}
+
+        <NotesSection data={localManual} isOwner={isOwner} onChange={handleExtraInfoChange} />
+
+        {isOwner && (
+          <div className="mt-8 space-y-2">
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={isSaving}
+              className="w-full py-3 rounded-full bg-[#FFF0E5] text-[#FF7A59] font-bold text-sm hover:opacity-80 transition disabled:opacity-60"
+            >
+              {isSaving ? '保存中...' : '保存'}
+            </button>
+            {saveStatus === 'saved' && <p className="text-center text-xs text-[#65A30D]">已保存</p>}
+            {saveStatus === 'error' && <p className="text-center text-xs text-[#DC2626]">保存失败，请稍后重试</p>}
+          </div>
+        )}
+      </div>
+    </motion.div>
+  )
+}
+
+// --- 尺码档案 Tab ---
+function SizeTab({
+  data,
+  isOwner,
+  onChange,
+  onExtraInfoChange,
+}: {
+  data: Partial<UserManual>
+  isOwner: boolean
+  onChange: ManualChange
+  onExtraInfoChange: (key: keyof ExtraInfo, value: string) => void
+}) {
+  const fields: Array<
+    | { source: 'manual'; key: ManualStringField; label: string; placeholder: string }
+    | { source: 'extra'; key: keyof ExtraInfo; label: string; placeholder: string; fallbackKey?: ManualStringField }
+  > = [
+    { source: 'extra', key: 'height_weight', label: '身高/体重', placeholder: '165cm / 52kg' },
+    { source: 'manual', key: 'clothes_size', label: '上衣尺码', placeholder: 'M' },
+    { source: 'manual', key: 'pants_size', label: '裤子尺码', placeholder: '26 (M)' },
+    { source: 'manual', key: 'shoe_size', label: '鞋子尺码', placeholder: '38' },
+    { source: 'extra', key: 'underwear_size', label: '内衣尺码', placeholder: '75B', fallbackKey: 'ring_size' },
+  ]
+
+  const getFieldValue = (field: (typeof fields)[number]) =>
+    field.source === 'manual' ? toText(data[field.key]) : getExtraText(data, field.key, field.fallbackKey)
+
+  const handleCopy = async () => {
+    const content = fields.map((field) => `${field.label}：${getFieldValue(field) || '-'}`).join('\n')
+    try {
+      await navigator.clipboard.writeText(content)
+      alert('已复制所有尺码信息')
+    } catch {
+      alert('复制失败，请手动复制')
+    }
+  }
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+      <h2 className="font-bold text-[#333] text-lg">尺码档案</h2>
       
-      <div className="grid grid-cols-2 gap-3">
-        {fields.map(({ key, label, emoji }) => (
-          <div key={key} className="flex flex-col bg-white/60 p-3 rounded-2xl border border-orange-50/50">
-            <span className="text-xs text-stone-400 font-medium mb-1.5">
-              {emoji} {label}
-            </span>
-            {editing ? (
+      <div className="bg-white rounded-3xl p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] space-y-6">
+        {fields.map((field) => (
+          <div key={field.label} className="flex justify-between items-center border-b border-[#F5F5F5] pb-4 last:border-0 last:pb-0">
+            <span className="text-[#666] text-sm">{field.label}</span>
+            {isOwner ? (
               <input
                 type="text"
-                value={manual?.[key] || ''}
-                onChange={(e) => onChange(key, e.target.value)}
-                placeholder="未填写"
-                className="w-full px-2 py-1.5 text-sm bg-white rounded-xl border-none ring-1 ring-orange-100 focus:ring-2 focus:ring-orange-300 outline-none transition-all"
+                value={getFieldValue(field)}
+                onChange={(e) => {
+                  if (field.source === 'manual') {
+                    onChange(field.key, e.target.value)
+                    return
+                  }
+                  onExtraInfoChange(field.key, e.target.value)
+                }}
+                placeholder={field.placeholder}
+                className="text-right text-[#333] font-medium text-sm outline-none w-1/2"
               />
             ) : (
-              <span className="text-sm font-medium text-stone-700">{manual?.[key] || '-'}</span>
+              <span className="text-[#333] font-medium text-sm">{getFieldValue(field) || '-'}</span>
             )}
           </div>
         ))}
-      </div>
-    </motion.div>
-  )
-}
 
-// --- 饮食偏好部分 ---
-function DietSection({
-  manual = {} as UserManual,
-  editing,
-  onChange,
-}: {
-  manual?: UserManual
-  editing: boolean
-  onChange: (field: 'diet_preferences', value: DietPreferences) => void
-}) {
-  const diet = manual?.diet_preferences || {}
-
-  const fields = [
-    { key: 'favorites' as const, label: '喜欢的食物', emoji: '😋', placeholder: '火锅、烧烤、日料、甜品...' },
-    { key: 'dislikes' as const, label: '不吃 / 少吃', emoji: '🙅', placeholder: '不吃辣、少吃油腻、不吃香菜...' },
-    { key: 'allergies' as const, label: '过敏 / 忌口', emoji: '⚠️', placeholder: '海鲜、花生、牛奶...' },
-  ]
-  
-  const getVal = (key: keyof DietPreferences) => {
-    const val = diet[key]
-    return Array.isArray(val) ? val.join('，') : (val || '')
-  }
-
-  return (
-    <motion.div variants={itemVariants} className="bg-[#F8FCF8] rounded-3xl p-5 shadow-sm shadow-green-900/5">
-      <div className="flex items-center gap-2 mb-4">
-        <div className="p-1.5 bg-green-100 rounded-full text-green-600">
-          <Utensils size={16} />
-        </div>
-        <h4 className="font-semibold text-stone-700 tracking-wide">饮食爱好</h4>
-      </div>
-
-      <div className="space-y-4">
-        {fields.map(({ key, label, emoji, placeholder }) => (
-          <div key={key}>
-            <p className="text-xs text-stone-500 font-medium mb-1.5 flex items-center gap-1.5">
-              <span>{emoji}</span> {label}
-            </p>
-            {editing ? (
-              <textarea
-                value={getVal(key)}
-                onChange={(e) => onChange('diet_preferences', { ...diet, [key]: e.target.value })}
-                placeholder={placeholder}
-                className="w-full px-4 py-3 text-sm bg-white rounded-2xl border-none ring-1 ring-green-100 focus:ring-2 focus:ring-green-300 outline-none resize-none transition-all shadow-sm shadow-green-900/5"
-                rows={2}
-              />
-            ) : (
-              <div className="text-sm text-stone-600 bg-white/70 rounded-2xl p-3.5 leading-relaxed shadow-sm shadow-green-900/5 border border-green-50/50">
-                {getVal(key) || <span className="text-stone-400 italic">等待解锁说明...</span>}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </motion.div>
-  )
-}
-
-// --- 情绪指南部分 ---
-function EmotionalSection({
-  manual = {} as UserManual,
-  editing,
-  onChange,
-}: {
-  manual?: UserManual
-  editing: boolean
-  onChange: (field: keyof NonNullable<UserManual['emotional_guide']>, value: string) => void
-}) {
-  const guide = manual?.emotional_guide || {}
-
-  const fields = [
-    { key: 'when_sad' as const, label: '难过时', emoji: '🥺', placeholder: '抱抱我，给我买杯奶茶...' },
-    { key: 'when_angry' as const, label: '生气时', emoji: '😤', placeholder: '先让我冷静十分钟，然后...' },
-    { key: 'when_stressed' as const, label: '压力大时', emoji: '😫', placeholder: '陪我散散步，听我吐槽...' },
-  ]
-
-  return (
-    <motion.div variants={itemVariants} className="bg-[#FFF6F7] rounded-3xl p-5 shadow-sm shadow-rose-900/5">
-      <div className="flex items-center gap-2 mb-4">
-        <div className="p-1.5 bg-rose-100 rounded-full text-rose-500">
-          <Heart size={16} />
-        </div>
-        <h4 className="font-semibold text-stone-700 tracking-wide">情绪指南</h4>
-      </div>
-
-      <div className="space-y-4">
-        {fields.map(({ key, label, emoji, placeholder }) => (
-          <div key={key}>
-            <p className="text-xs text-stone-500 font-medium mb-1.5 flex items-center gap-1.5">
-              <span>{emoji}</span> {label}
-            </p>
-            {editing ? (
-              <textarea
-                value={guide[key] || ''}
-                onChange={(e) => onChange(key, e.target.value)}
-                placeholder={placeholder}
-                className="w-full px-4 py-3 text-sm bg-white rounded-2xl border-none ring-1 ring-rose-100 focus:ring-2 focus:ring-rose-300 outline-none resize-none transition-all shadow-sm shadow-rose-900/5"
-                rows={2}
-              />
-            ) : (
-              <div className="text-sm text-stone-600 bg-white/70 rounded-2xl p-3.5 leading-relaxed shadow-sm shadow-rose-900/5 border border-rose-50/50">
-                {guide[key] || <span className="text-stone-400 italic">等待解锁说明...</span>}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </motion.div>
-  )
-}
-
-// --- 头像切换器 ---
-export function AvatarSwitcher({ current, onChange }: { current: 'mine' | 'partner', onChange: (who: 'mine' | 'partner') => void }) {
-  return (
-    <div className="flex justify-center items-center gap-8 py-6">
-      {[
-        { id: 'mine', label: '我', emoji: '🙋‍♀️', color: 'from-orange-100 to-amber-50' },
-        { id: 'partner', label: 'Ta', emoji: '💁‍♂️', color: 'from-sky-100 to-blue-50' }
-      ].map((item) => {
-        const isActive = current === item.id
-        return (
-          <button
-            key={item.id}
-            onClick={() => onChange(item.id as 'mine' | 'partner')}
-            className="relative flex flex-col items-center gap-2 outline-none group"
+        {!isOwner && (
+          <button 
+            type="button"
+            onClick={handleCopy}
+            className="w-full mt-4 py-3 rounded-full bg-[#FFF0E5] text-[#FF7A59] font-bold text-sm hover:opacity-80 transition"
           >
-            <motion.div
-              animate={{ scale: isActive ? 1.1 : 0.9, opacity: isActive ? 1 : 0.5 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-              className={cn(
-                'w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-sm z-10',
-                isActive ? `bg-gradient-to-br ${item.color} ring-4 ring-white` : 'bg-stone-100 grayscale-[30%]'
-              )}
-            >
-              {item.emoji}
-            </motion.div>
-            <span className={cn("text-xs font-medium transition-colors", isActive ? "text-stone-700" : "text-stone-400")}>
-              {item.label}
-            </span>
+            一键复制
           </button>
+        )}
+      </div>
+    </motion.div>
+  )
+}
+
+// --- 饮食偏好 Tab ---
+function DietTab({ data, isOwner, onChange }: { data: Partial<UserManual>, isOwner: boolean, onChange: ManualChange }) {
+  const diet: DietPreferences = data.diet_preferences || {}
+  const favorites = parseTags(diet.favorites)
+  const dislikes = parseTags(diet.dislikes)
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+      {/* 喜欢 */}
+      <div className="bg-white rounded-3xl p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+        <h3 className="font-bold text-[#333] mb-4 flex items-center gap-2">
+          喜欢 <span className="text-xl">👍</span>
+        </h3>
+        
+        {isOwner ? (
+           <textarea
+             value={toText(diet.favorites)}
+             onChange={(e) => onChange('diet_preferences', { ...diet, favorites: e.target.value })}
+             placeholder="输入喜欢的食物，用逗号隔开"
+             className="w-full text-sm bg-[#F0FDF4] p-3 rounded-xl outline-none resize-none text-[#15803D]"
+             rows={3}
+           />
+        ) : (
+          <div className="flex flex-wrap gap-3">
+            {favorites.length > 0 ? favorites.map((tag, i) => (
+              <span key={i} className="px-4 py-2 bg-[#E8F5E9] text-[#2E7D32] rounded-full text-sm font-medium">
+                {tag}
+              </span>
+            )) : <span className="text-[#999] text-sm">Ta还没有填写哦</span>}
+          </div>
+        )}
+      </div>
+
+      {/* 讨厌/过敏 */}
+      <div className="bg-white rounded-3xl p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+        <h3 className="font-bold text-[#333] mb-4 flex items-center gap-2">
+          过敏 / 讨厌 <span className="text-xl">👎</span>
+        </h3>
+        
+        {isOwner ? (
+           <textarea
+             value={toText(diet.dislikes)}
+             onChange={(e) => onChange('diet_preferences', { ...diet, dislikes: e.target.value })}
+             placeholder="输入讨厌的食物，用逗号隔开"
+             className="w-full text-sm bg-[#FEF2F2] p-3 rounded-xl outline-none resize-none text-[#B91C1C]"
+             rows={3}
+           />
+        ) : (
+          <div className="flex flex-wrap gap-3">
+            {dislikes.length > 0 ? dislikes.map((tag, i) => (
+              <span key={i} className="px-4 py-2 bg-[#FFEBEE] text-[#C62828] rounded-full text-sm font-medium">
+                {tag}
+              </span>
+            )) : <span className="text-[#999] text-sm">Ta还没有填写哦</span>}
+          </div>
+        )}
+      </div>
+
+    </motion.div>
+  )
+}
+
+// --- 情绪指南 Tab ---
+function EmotionalGuideTab({ data, isOwner, onChange }: { data: Partial<UserManual>, isOwner: boolean, onChange: ManualChange }) {
+  const guide: EmotionalGuide = data.emotional_guide || {}
+  const textFields: Array<{ key: keyof EmotionalGuide; label: string; placeholder: string; className: string }> = [
+    { key: 'when_sad', label: '难过时', placeholder: '比如：先抱抱我，不急着讲道理', className: 'bg-[#F5F8FF] text-[#2563EB]' },
+    { key: 'when_angry', label: '生气时', placeholder: '比如：给我一点时间冷静，再好好说', className: 'bg-[#FEF2F2] text-[#B91C1C]' },
+    { key: 'when_stressed', label: '压力大时', placeholder: '比如：帮我拆小任务，陪我散步', className: 'bg-[#FFF7ED] text-[#C2410C]' },
+    { key: 'love_languages', label: '爱的语言', placeholder: '比如：陪伴，肯定的话，仪式感', className: 'bg-[#FFF0F6] text-[#BE185D]' },
+    { key: 'comfort_items', label: '安慰小物', placeholder: '比如：热奶茶，毛毯，喜欢的歌单', className: 'bg-[#F0FDF4] text-[#15803D]' },
+  ]
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5">
+      <h2 className="font-bold text-[#333] text-lg">情绪指南</h2>
+
+      {textFields.map((field) => {
+        const value = guide[field.key]
+        const tags = parseTags(value)
+
+        return (
+          <div key={field.key} className="bg-white rounded-3xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+            <h3 className="font-bold text-[#333] mb-3">{field.label}</h3>
+            {isOwner ? (
+              <textarea
+                value={toText(value)}
+                onChange={(e) => onChange('emotional_guide', { ...guide, [field.key]: e.target.value })}
+                placeholder={field.placeholder}
+                className={`w-full text-sm p-3 rounded-xl outline-none resize-none ${field.className}`}
+                rows={3}
+              />
+            ) : tags.length > 1 ? (
+              <div className="flex flex-wrap gap-2">
+                {tags.map((tag, index) => (
+                  <span key={`${field.key}-${index}`} className={`px-3 py-1.5 rounded-full text-sm font-medium ${field.className}`}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[#333] text-sm leading-relaxed bg-[#FAFAFA] p-3 rounded-xl">
+                {toText(value) || 'Ta还没有填写哦'}
+              </p>
+            )}
+          </div>
         )
       })}
-    </div>
+    </motion.div>
   )
 }
 
-// --- 主卡片组件 ---
-// --- 主卡片组件 ---
-export function ManualCard({ manual, isOwner, onUpdate }: ManualCardProps) {
-  const [editing, setEditing] = useState(false)
-  const [editData, setEditData] = useState<Partial<UserManual>>(manual || {})
-  
-  const [prevManual, setPrevManual] = useState(manual)
-  if (manual !== prevManual) {
-    setPrevManual(manual)
-    setEditData(manual || {})
-    setEditing(false)
-  }
-
-  const handleFieldChange = (field: keyof UserManual, value: string | DietPreferences) => {
-    setEditData((prev) => ({ ...prev, [field]: value }))
-  }
-
-  const handleEmotionalChange = (field: keyof NonNullable<UserManual['emotional_guide']>, value: string) => {
-    setEditData((prev) => ({
-      ...prev,
-      emotional_guide: { ...(prev.emotional_guide || {}), [field]: value },
-    }))
-  }
-
-  const handleSave = () => {
-    onUpdate?.(editData)
-    setEditing(false)
-  }
-
-  const handleCancel = () => {
-    setEditData(manual || {})
-    setEditing(false)
-  }
-
-  const isEmptyData = !manual || Object.keys(manual).length === 0
-
-  if (!isOwner && isEmptyData) {
-    return (
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="flex flex-col items-center justify-center py-24 bg-[#FDFBF7] rounded-[2rem] border border-stone-100"
-      >
-        <div className="text-5xl mb-4 opacity-80 grayscale-[20%]">☁️</div>
-        <h3 className="text-stone-600 font-medium mb-2 text-lg">Ta 还没有填写说明书哦</h3>
-        <p className="text-stone-400 text-sm">提醒 Ta 来完善一下吧 ~</p>
-      </motion.div>
-    )
-  }
-
-  const displayManual = editing ? (editData as UserManual) : (manual || {} as UserManual)
+function NotesSection({
+  data,
+  isOwner,
+  onChange,
+}: {
+  data: Partial<UserManual>
+  isOwner: boolean
+  onChange: (key: keyof ExtraInfo, value: string) => void
+}) {
+  const notes = toText(data.extra_info?.notes)
 
   return (
-    <motion.div 
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-      className="bg-[#FDFBF7] min-h-screen p-4 pb-20 font-sans relative"
-    >
-      {/* 头部区域 - 悬浮吸顶设计 */}
-      <div className="sticky top-0 z-50 flex items-center justify-between px-2 py-3 -mx-2 mb-4 bg-[#FDFBF7]/80 backdrop-blur-md border-b border-orange-900/5 transition-all">
-        <div className="flex items-center gap-2">
-          <div className="bg-white p-2 rounded-xl shadow-sm shadow-orange-900/5">📖</div>
-          <h3 className="font-bold text-lg text-stone-800 tracking-wide">
-            {isOwner ? '我的使用说明书' : 'Ta的使用说明书'}
-          </h3>
-        </div>
-        
-        {isOwner && (
-          <AnimatePresence mode="wait">
-            {editing ? (
-              <motion.div 
-                key="editing"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className="flex gap-2"
-              >
-                <button onClick={handleCancel} className="p-2.5 text-stone-400 bg-white rounded-full shadow-sm hover:text-stone-600 active:scale-95 transition-all border border-stone-100">
-                  <X size={18} />
-                </button>
-                <button onClick={handleSave} className="p-2.5 text-white bg-orange-400 rounded-full shadow-md shadow-orange-400/30 active:scale-95 transition-all">
-                  <Check size={18} />
-                </button>
-              </motion.div>
-            ) : (
-              <motion.button
-                key="viewing"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                onClick={() => setEditing(true)}
-                className="p-2.5 text-stone-500 bg-white rounded-full shadow-sm shadow-orange-900/5 hover:text-orange-500 active:scale-95 transition-all border border-stone-100/50"
-              >
-                <Edit2 size={18} />
-              </motion.button>
-            )}
-          </AnimatePresence>
-        )}
-      </div>
-
-      {/* 各部分内容卡片 */}
-      <div className="space-y-5 mt-2">
-        <SizeSection manual={displayManual} editing={editing} onChange={handleFieldChange} />
-        <DietSection manual={displayManual} editing={editing} onChange={handleFieldChange} />
-        <EmotionalSection manual={displayManual} editing={editing} onChange={handleEmotionalChange} />
-      </div>
-
-      {/* 底部温柔提示 */}
-      <AnimatePresence>
-        {isOwner && !editing && (
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-xs text-stone-400 text-center flex items-center justify-center gap-1 pt-6 pb-8"
-          >
-            <span>💡</span> 随时更新说明书，让爱意有迹可循
-          </motion.p>
-        )}
-      </AnimatePresence>
-    </motion.div>
+    <div className="mt-8">
+      <h3 className="text-[#666] text-sm mb-3">其他备注</h3>
+      {isOwner ? (
+        <textarea
+          value={notes}
+          onChange={(event) => onChange('notes', event.target.value)}
+          placeholder="写下更多需要 Ta 记住的小细节"
+          className="w-full text-[#333] text-sm bg-white p-4 rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.02)] outline-none resize-none"
+          rows={3}
+        />
+      ) : (
+        <p className="text-[#333] text-sm bg-white p-4 rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+          {notes || 'Ta还没有填写备注哦'}
+        </p>
+      )}
+    </div>
   )
 }

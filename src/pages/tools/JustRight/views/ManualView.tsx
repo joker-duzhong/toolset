@@ -1,6 +1,6 @@
 // 说明书视图
 import { useState } from 'react'
-import { ManualCard, AvatarSwitcher } from '../components/ManualSection'
+import { ManualCard } from '../components/ManualSection'
 import type { UserManual } from '../types'
 
 interface ManualViewProps {
@@ -21,9 +21,23 @@ export function ManualView({
 
   return (
     <div className="min-h-full pb-6">
-      {/* 头部切换 */}
-      <div className="bg-gradient-to-b from-violet-50 to-transparent pt-2 pb-6">
-        <AvatarSwitcher current={currentView} onChange={setCurrentView} />
+      <div className="bg-gradient-to-b from-violet-50 to-transparent pt-4 pb-6">
+        <div className="mx-auto flex w-fit rounded-full bg-white/80 p-1 shadow-sm">
+          <button
+            type="button"
+            onClick={() => setCurrentView('mine')}
+            className={`rounded-full px-4 py-2 text-sm ${isMine ? 'bg-stone-900 text-white' : 'text-stone-500'}`}
+          >
+            我的
+          </button>
+          <button
+            type="button"
+            onClick={() => setCurrentView('partner')}
+            className={`rounded-full px-4 py-2 text-sm ${!isMine ? 'bg-stone-900 text-white' : 'text-stone-500'}`}
+          >
+            Ta 的
+          </button>
+        </div>
       </div>
 
       {/* 说明书内容 */}
@@ -31,6 +45,7 @@ export function ManualView({
         <ManualCard
           manual={currentManual}
           isOwner={isMine}
+          onClose={() => undefined}
           onUpdate={onUpdate}
         />
       </div>
